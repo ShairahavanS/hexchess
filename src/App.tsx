@@ -1,10 +1,12 @@
-import logo from "./HexChessLogo.svg";
+import React from "react";
+// import logo from "./HexChessLogo.svg";
 import "./App.css";
+import Grid from "./Grid/Grid.tsx";
 
 function App() {
   return (
     <div className="App">
-      <link rel="icon" href="./HexChessLogo.svg" />
+      {/* <link rel="icon" href="./HexChessLogo.svg" />
 
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
@@ -19,7 +21,8 @@ function App() {
         >
           Learn React
         </a>
-      </header>
+      </header> */}
+      <Grid />
     </div>
   );
 }

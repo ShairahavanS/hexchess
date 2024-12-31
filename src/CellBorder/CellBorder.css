@@ -1,0 +1,9 @@
+.cell-border {
+  position: relative;
+  background-color: yellow;
+  width: 53px;
+  height: 43.3px;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  align-items: center;
+  justify-content: center;
+}
