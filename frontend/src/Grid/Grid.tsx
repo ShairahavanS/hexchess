@@ -17,8 +17,8 @@ function Grid() {
     for (let j = 0; j < i; j++) {
       tempDivs.push(
         <div key={`cell-${i}-${j}`} className="hex-grid">
-          <CellBorder/>
-          <Cell />
+          <CellBorder />
+          <Cell row={i} col={j} />
         </div>
       );
     }
@@ -39,7 +39,7 @@ function Grid() {
       tempDivs.push(
         <div key={`cell-${i}-${j}`} className="hex-grid" >
           <CellBorder/>
-          <Cell/>
+          <Cell row={i} col={j} />
         </div>
       );
     }
