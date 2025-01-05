@@ -8,7 +8,6 @@ class Hexagon:
         self.startingPoint = 0
         self.adjacent = 0
         self.revealed = 0
-        self.visited = 0
         self.flagged = 0
 
         self.top = 0

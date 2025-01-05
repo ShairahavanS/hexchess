@@ -15,7 +15,7 @@ class HexagonGrid:
         ]
         self.numCells = ((self.sideLength * 2 - 2) * (self.sideLength * 2 - 1) - (self.sideLength) * (self.sideLength - 1)) + 2 * self.sideLength - 1
         self.totalMines = int(0.2 * self.numCells)
-        self.codes = {}
+        self.keys = {}
         self.minesArray = list()
         self.numberRevealed = self.numCells - self.totalMines
         self.flagsAvailable = self.totalMines
@@ -37,12 +37,12 @@ class HexagonGrid:
                     self.grid[column][row].outOfBounds = 1
 
         # Assign codes to valid cells
-        code = 0
+        code = 1
         for column in range(self.columns):
             for row in range(self.rows):
                 if self.grid[column][row].outOfBounds == 0:
                     self.grid[column][row].code = code
-                    self.codes[code] = (column, row)
+                    self.keys[code] = (column, row)
                     code = code + 1
 
                     # Assign neighbors (referencing existing Hexagons)
@@ -85,8 +85,8 @@ class HexagonGrid:
             check = 0
             while check == 0:
                 random_number = random.randint(0, self.numCells-1)
-                rowNumber = self.codes[random_number][1]
-                columnNumber = self.codes[random_number][0]
+                rowNumber = self.keys[random_number][1]
+                columnNumber = self.keys[random_number][0]
                 if (self.grid[columnNumber][rowNumber].outOfBounds == 0 and self.grid[columnNumber][rowNumber].startingPoint == 0): 
                     if (self.grid[columnNumber][rowNumber].mine == 0):
                         self.grid[columnNumber][rowNumber].mine = 1
@@ -252,8 +252,8 @@ class HexagonGrid:
 
     def gameLost(self):
         for items in self.minesArray:
-            rowNumber = self.codes[items][1]
-            columnNumber = self.codes[items][0]
+            rowNumber = self.keys[items][1]
+            columnNumber = self.keys[items][0]
 
             self.grid[columnNumber][rowNumber].revealed = 1
 
@@ -267,11 +267,24 @@ class HexagonGrid:
             for column in range(self.columns):
                 if self.grid[column][row].outOfBounds == 1:
                     sure = sure + "   "
-                elif self.grid[column][row].mine == 1:
-                    sure = sure + " X "
+                # elif self.grid[column][row].mine == 1:
+                #     sure = sure + " X "
                 else:
-                    sure = sure + " " + str(self.grid[column][row].adjacent) + " "
+                    sure = sure + " " + str(self.grid[column][row].code) + " "
             print(sure)
+
+            # for row in range(self.rows):
+            #     for column in range(self.columns):               
+            #         print(self.grid[column][row].__str__())  # Corrected the call to __str__()
+            #         print(f"Out of Bounds (bool): {self.grid[column][row].outOfBounds}, "
+            #             f"Code (int): {self.grid[column][row].code}, "
+            #             f"Mine (bool): {self.grid[column][row].startingPoint}, "
+            #             f"Adjacent (int): {self.grid[column][row].adjacent}, "
+            #             f"Revealed (bool): {self.grid[column][row].revealed}, "
+            #             f"Flagged (bool): {self.grid[column][row].flagged}")
+            #         print("")  # Blank line between rows
+
+
     
     def print(self):
         #print the hexagon
@@ -340,9 +353,9 @@ row = int(x)
 
 sure.generateMines(column, row)
 sure.singleClickCell(column, row)
-sure.printStart()
+sure.printTest()
 
-sure.print()
+# sure.print()
 
 while 2 > 1:
     print("\nColumn Number: ")

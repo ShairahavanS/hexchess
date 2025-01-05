@@ -1,64 +1,104 @@
-import React, { JSX } from 'react';
-import './Grid.css';
-import Cell from '../Cell/Cell.tsx';
-import CellBorder from '../CellBorder/CellBorder.tsx'
+import React, { JSX, useRef, useState, useEffect } from "react";
+import "./Grid.css";
+import Cell from "../Cell/Cell.tsx";
+import CellBorder from "../CellBorder/CellBorder.tsx";
 
+interface GridProps {
+  sideLength: number;
+}
 
-function Grid() {
-  const sideLength = 6;
+function Grid({ sideLength }: GridProps) {
   const divs: JSX.Element[] = [];
+  const width = (2 * 100.0) / (3 * sideLength - 1); // This should give consistent width
+  const height = 100.0 / (2 * sideLength - 1); // This should give consistent height
 
-  let shift = 152.9;
+  // const shiftUpdate = 0;
+  // let shift = 0; // Start shift at 0 and update in the loop if needed
+  const horizontalShift = -width / 4.0; // Horizontal offset for centering
+  let count = 1; // cell ID initialization
 
   // First half of the columns
-  for (let i = sideLength; i < 2*(sideLength); i++) {
+  for (let i = sideLength; i < 2 * sideLength; i++) {
     const tempDivs: JSX.Element[] = [];
-    shift -= 21.7
+    // shift -= shiftUpdate; // Adjust vertical position (if needed, can be simplified)
     for (let j = 0; j < i; j++) {
       tempDivs.push(
-        <div key={`cell-${i}-${j}`} className="hex-grid">
-          <CellBorder/>
-          <Cell />
+        <div
+          className="cell-border"
+          style={{
+            // width: `${width}%`,
+            // height: `${height}%`,
+            // width: `${100 + ((2 * sideLength - 2) * width) / 4}%`,
+            width: "100%",
+            height: `100%`,
+          }}
+        >
+          <Cell key={count} />
         </div>
       );
+      ++count;
     }
 
     divs.push(
-      <div key={`row-${i}`} style={{ marginTop: `${shift}px`, marginLeft: `0px` }}>
+      <div
+        className="hex-column"
+        style={{
+          width: `100%`,
+          height: `${i * height}%`,
+          marginTop: `0%`,
+          // marginLeft: `0%`,
+          marginLeft: `${i == sideLength ? 0 : horizontalShift}%`,
+        }}
+      >
         {tempDivs}
-        <h1>yo</h1>
       </div>
     );
   }
 
   // Second half of the columns
-  for (let i = 2*sideLength-2; i >= sideLength; i--) {
+  for (let i = 2 * sideLength - 2; i >= sideLength; i--) {
     const tempDivs: JSX.Element[] = [];
-    shift += 21.7;
+    // shift -= shiftUpdate; // Adjust vertical position (if needed, can be simplified)
     for (let j = 0; j < i; j++) {
       tempDivs.push(
-        <div key={`cell-${i}-${j}`} className="hex-grid" >
-          <CellBorder/>
-          <Cell/>
+        <div
+          className="cell-border"          
+          style={{
+            // width: `${width}%`,
+            // height: `${height}%`,
+            // width: `${(100 * (2 * sideLength)) / (2 * sideLength - 1)}%`,
+            width: "100%",
+            height: `100%`,
+          }}
+        >
+          <Cell key={count}/>
         </div>
       );
+      ++count;
     }
 
     divs.push(
-      <div key={`row-${i}`} style={{ marginTop: `${shift}px`, marginLeft: `0px` }}>
+      <div
+        className="hex-column"
+        style={{
+          width: `100%`,
+          height: `${i * height}%`,
+          marginTop: `0%`,
+          marginLeft: `${horizontalShift}%`,
+        }}
+      >
         {tempDivs}
-        <h1>yo</h1>
       </div>
     );
   }
 
   return (
-    <div className="grid-container">
-      <div className="grid-container">
+    <>
+      <div className="grid-container" style={{ marginTop: "0px" }}>
         {divs}
       </div>
-    </div>
+    </>
   );
-};
+}
 
 export default Grid;

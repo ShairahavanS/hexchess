@@ -1,12 +1,17 @@
-import React from 'react';
-import './CellBorder.css';
+import React from "react";
+import "./CellBorder.css";
+import Cell from "../Cell/Cell.tsx"; // Correct import path
 
-function CellBorder() {
-	return (
-		<div
-			className="cell-border"
-		/>
-	);
+interface CellBorderProps {
+  style?: React.CSSProperties; // Allow inline style
+}
+
+const CellBorder: React.FC<CellBorderProps> = ({ style }) => {
+  return (
+    <div style={style} className="cell-border">
+      <Cell></Cell>
+    </div>
+  );
 };
 
 export default CellBorder;
