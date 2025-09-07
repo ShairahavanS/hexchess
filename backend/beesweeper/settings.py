@@ -112,6 +112,6 @@ CORS_ALLOWED_ORIGINS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://hexagonal-games-backend.onrender.com",
-    "https://hexchess-ten.vercel.app/",
+    "https://hexchess-ten.vercel.app",
     "https://ShairahavanS.github.io",
 ]
