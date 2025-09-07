@@ -12,7 +12,12 @@ import six from "../images/beesweeper/Number 6.svg";
 import honey from "../images/beesweeper/Honey.svg";
 import axios from "axios";
 import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
-import { api } from "../api";
+
+const BACKEND_URL = "https://hexagonal-games-backend.onrender.com"; // replace with your Render URL
+
+export const api = axios.create({
+  baseURL: BACKEND_URL,
+});
 
 export enum CellState {
   Unbroken = "unbroken",

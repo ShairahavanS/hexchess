@@ -4,7 +4,12 @@ import Grid from "../Grid/Grid.tsx";
 import MinesweeperInfoBoard from "../MinesweeperInfoBoard/MinesweeperInfoBoard.tsx";
 import axios from "axios";
 import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
-import { api } from "../api";
+
+const BACKEND_URL = "https://hexagonal-games-backend.onrender.com"; // replace with your Render URL
+
+export const api = axios.create({
+  baseURL: BACKEND_URL,
+});
 
 interface BeesweeperProps {
   darkMode: boolean;
@@ -18,7 +23,7 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   const [board, setBoard] = useState<MineCellInfo[]>([]);
   const [gameID, setGameID] = useState<string>("");
   const [gameState, setGameState] = useState("");
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
     api.post("/beesweeper_api/start/", { level })
@@ -41,10 +46,9 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
 
   useEffect(() => {
     if (gameState === "IP") {
-      if (!timerRef.current) {
-        timerRef.current = setInterval(() => {
-          setTime((prev) => prev + 1);
-        }, 1000);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
       }
     }
 
