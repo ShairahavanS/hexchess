@@ -104,14 +104,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # CORS / CSRF
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    "https://<your-vercel-app>.vercel.app",
-    "https://<your-netlify-app>.netlify.app",
+    "https://hexchess-ten.vercel.app/",
     "https://ShairahavanS.github.io",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://*.onrender.com",
-    "https://*.vercel.app",
-    "https://*.netlify.app",
+    "https://hexagonal-games-backend.onrender.com",
+    "https://hexchess-ten.vercel.app/",
     "https://ShairahavanS.github.io",
 ]
