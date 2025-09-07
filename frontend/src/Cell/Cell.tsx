@@ -97,7 +97,6 @@ const Cell: React.FC<CellProps> = ({
       .catch((error) => console.error("Error flagging cell:", error));
   };
 
-  /** Handle middle click or left+right click */
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
 
