@@ -104,7 +104,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # CORS / CSRF
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    "https://hexchess-ten.vercel.app/",
+    "https://hexchess-ten.vercel.app",
     "https://ShairahavanS.github.io",
 ]
 
