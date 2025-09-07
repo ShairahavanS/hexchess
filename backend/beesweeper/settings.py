@@ -2,12 +2,18 @@
 Django settings for beesweeper project.
 """
 
-import os
 from pathlib import Path
 import dj_database_url
-
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+DATABASES = {
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
+    )
+}
+
 
 # SECURITY
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
@@ -69,10 +75,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "beesweeper.wsgi.application"
 
-# Database
-DATABASES = {
-    "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
-}
 
 # If you want PostgreSQL on Render later, replace with:
 # DATABASES = {
