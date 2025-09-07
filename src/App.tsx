@@ -1,53 +1,37 @@
-import React from "react";
-// import logo from "./HexChessLogo.svg";
-import "./App.css";
-import Grid from "./Grid/Grid.tsx";
-import Navbar from "./navbar/Navbar.tsx";
-import { relative } from "path";
-// import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./Navbar/Navbar.tsx";
+import Footer from "./Footer/Footer.tsx";
+import Home from "./pages/Home.tsx";
+import Beesweeper from "./pages/Beesweeper.tsx";
+import Chess from "./pages/Chess.tsx";
+import Checkers from "./pages/Checkers.tsx";
 
-function App() {
-  let sides = 100;
-  /** smallSidelength = x, width = smallSideLength * (4*sides-1) = 500 height =  (2*sides - 1) * smallSideLength * */
-  let width = 800;
-  let smallSideLength = width / (3 * sides - 1);
-  let height = (2 * sides - 1) * smallSideLength * Math.sqrt(3);
+const App: React.FC = () => {
+  const [darkMode, setDarkMode] = useState(true);
+
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setDarkMode((prevMode) => !prevMode);
+  };
 
   return (
-    <div className="App">
-      {/* <link rel="icon" href="./HexChessLogo.svg" />
+    <Router>
+      <div className={`App ${darkMode ? "dark-mode" : ""}`}>
+        <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
 
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header> */}
-      <Navbar />
-      <div
-        style={{
-          // width: `500px`,
-          // height: `550px`,
-          width: `${width}px`,
-          height: `${height}px`,
-          backgroundColor: "red",
-          position: "relative",
-        }}
-      >
-        {/* <h1>{width}</h1>
-        <h1>{height}</h1> */}
-        <Grid sideLength={sides} />
+        <div className="main-content">
+          <Routes>
+            <Route path="/" element={<Home darkMode={darkMode} />} />
+            <Route path="/Beesweeper" element={<Beesweeper darkMode={darkMode} />} />
+            <Route path="/Chess" element={<Chess darkMode={darkMode} />} />
+            <Route path="/Checkers" element={<Checkers darkMode={darkMode} />} />
+          </Routes>
+        </div>
+        <Footer />
       </div>
-    </div>
+    </Router>
   );
-}
+};
 
 export default App;

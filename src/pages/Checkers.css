@@ -1,0 +1,44 @@
+.checkerboard {
+  height: 92%;
+  width: 92%;
+}
+
+.grid-area-checkers {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 5vw;
+  clip-path: polygon(
+    2% 25%,
+    46% 2%,
+    54% 2%,
+    98% 25%,
+    98% 75%,
+    54% 98%,
+    46% 98%,
+    2% 75%
+  );
+
+  background: linear-gradient(
+    90deg,
+    #22130d 25%,
+    #421c02 100%
+  );
+
+  background-size: 56.57px 56.57px;
+}
+
+.board-complete-checkers {
+  background-color: black;
+  display: flex; /* Added flexbox to position the grid and info board side by side */
+  justify-content: space-between; /* Space between the grid and info board */
+  align-items: center; /* Keep the content aligned to the top */
+  height: 100vh; /* Full height */
+}
+
+.infoBoar-checkers {
+  background-color: lightgray; /* Just a placeholder color */
+  width: 50vmin; /* Set a fixed width for the info board */
+  margin-left: -20vmin; /* Optional margin between grid and info board */
+}

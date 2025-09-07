@@ -1,0 +1,46 @@
+.Beesweeper {
+  height: 92%;
+  width: 92%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.grid-area {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* align top */
+  margin-left: 5vw; /* optional */
+}
+
+.board-complete {
+  background-color: black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 90vh;
+}
+
+.board-complete.dark {
+  background-color: #121212;
+  color: white;
+}
+
+.board-complete.light {
+  background-color: #b6c9e3;
+  color: black;
+}
+.infoBoard {
+  background-color: lightgray;
+  width: 50vmin;
+  margin-left: 0vmin;
+}
+
+/* .infoBoard {
+  background-color: lightgray;
+  position: fixed;
+  right: 20vmin;            
+  width: 50vmin;          
+} */

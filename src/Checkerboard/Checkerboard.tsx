@@ -1,26 +1,11 @@
 import React, { JSX, useRef, useState, useEffect } from "react";
-import "./Grid.css";
-import Cell from "../Cell/Cell.tsx";
-import axios from "axios";
-import { StringLiteral } from "typescript";
-import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
+import "./Checkerboard.css";
+import CheckerCell from "../CheckerCell/CheckerCell.tsx";
 
-interface GridProps {
-  sideLength: number;
-  level: string;
-  game_ID: string;
-  board: MineCellInfo[];
-  onUpdateBoard?: (newBoard: MineCellInfo[]) => void;
-  onUpdateFlags: (newFlags: number) => void;
-}
+interface CheckerboardProps {}
 
-function Grid({
-  sideLength,
-  game_ID,
-  board,
-  onUpdateBoard,
-  onUpdateFlags,
-}: GridProps) {
+function Checkerboard() {
+  const sideLength = 6;
   const divs: JSX.Element[] = [];
   const width = (2 * 100.0) / (3 * sideLength - 1); // This should give consistent width
   const height = 100.0 / (2 * sideLength - 1); // This should give consistent height
@@ -30,14 +15,11 @@ function Grid({
   const horizontalShift = -width / 4.0; // Horizontal offset for centering
   let count = 1; // cell ID initialization
 
-  const getCellData = (key: number) => board.find((cell) => cell.key === key);
-
   // First half of the columns
   for (let i = sideLength; i < 2 * sideLength; i++) {
     const tempDivs: JSX.Element[] = [];
     // shift -= shiftUpdate; // Adjust vertical position (if needed, can be simplified)
     for (let j = 0; j < i; j++) {
-      const cellData = getCellData(count);
       tempDivs.push(
         <div
           className="cell-border"
@@ -49,15 +31,7 @@ function Grid({
             height: `100%`,
           }}
         >
-          <Cell
-            key={count}
-            gameID={game_ID}
-            cellID={count}
-            cellData={cellData}
-            onUpdateBoard={onUpdateBoard}
-            onUpdateFlags={onUpdateFlags}
-          />
-          {/* <h1 style={{ color: "red" }}>{cellData?.revealed ? 1 : 0}</h1> */}
+          <CheckerCell key={count} cellID={count}  cellColour={(i+j)%3 }/>
         </div>
       );
       ++count;
@@ -84,7 +58,6 @@ function Grid({
     const tempDivs: JSX.Element[] = [];
     // shift -= shiftUpdate; // Adjust vertical position (if needed, can be simplified)
     for (let j = 0; j < i; j++) {
-      const cellData = getCellData(count);
       tempDivs.push(
         <div
           className="cell-border"
@@ -96,13 +69,7 @@ function Grid({
             height: `100%`,
           }}
         >
-          <Cell
-            key={count}
-            gameID={game_ID}
-            cellID={count}
-            cellData={cellData}
-            onUpdateBoard={onUpdateBoard}
-          />
+          <CheckerCell key={count} cellID={count} cellColour={(i+j)%3}/>
         </div>
       );
       ++count;
@@ -132,4 +99,4 @@ function Grid({
   );
 }
 
-export default Grid;
+export default Checkerboard;

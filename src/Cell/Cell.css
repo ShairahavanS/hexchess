@@ -1,12 +1,35 @@
+/* Hexagon Styling */
+
 .hexagon {
-  position: relative;
-	background-color: orange;
-	width: 90%;
-	height: 90%;
-  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-	align-items: center;
-  justify-content: center;
-	position: absolute;
+  background-color: orange;
+  width: 90%; /* Adjust the size of the hexagon */
+  height: 90%; /* Adjust the height for the hexagon */
+  clip-path: polygon(
+    25% 0%,
+    75% 0%,
+    100% 50%,
+    75% 100%,
+    25% 100%,
+    0% 50%
+  ); /* Hexagonal shape */
+
+  display: flex;
+  align-items: center; /* Vertically center the content */
+  justify-content: center; /* Horizontally center the content */
+  cursor: pointer; /* Cursor pointer on hover */
+
+  position: relative; /* Ensure flexbox works correctly */
+}
+
+/* Image inside the hexagon */
+.hexagon img {
+  position: absolute;
+  width: 80%; /* Adjust the image size relative to the hexagon */
+  height: 80%; /* Ensure the image maintains its aspect ratio */
+  object-fit: contain; /* Maintain image aspect ratio without stretching */
+  user-select: none;       /* Prevent text/image selection */
+  -webkit-user-drag: none; /* Prevent dragging images in WebKit browsers */
+  pointer-events: none;    /* Ignore pointer events on the image (so clicks go to the cell) */
 }
 
 /* .hexagon:hover {
@@ -14,13 +37,29 @@
 } */
 
 .hexagon.unbroken {
-    background-color: orange; /* or your default color */
-}
-
-.hexagon.empty {
-    background-color: tan;
+  background-color: orange; /* or your default color */
 }
 
 .hexagon.flagged {
-    background-color: #e24a4a;
+  background-color: orange; /* or your default color */
+}
+
+.hexagon.empty {
+  background-color: tan;
+  cursor: default;
+}
+
+.hexagon.numbered {
+  background-color: tan;
+  cursor: default;
+}
+
+.hexagon.bee {
+  background-color: red;
+  cursor: default;
+}
+
+.hexagon.honey {
+  background-color: rgb(102, 255, 0);
+  cursor: default;
 }

@@ -1,17 +1,8 @@
+/* App.css */
 .App {
-  text-align: center;
-  background-color: black;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full viewport height */
 }
 
 .App-header {
@@ -23,6 +14,23 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+.main-content {
+  background-color: #f4f4f4;
+  transition: background-color 0.3s ease;
+  height: 90vh; /* navbar is 10vh, so main content is 90vh */
+  overflow-y: auto; /* scroll if content overflows */
+}
+
+/* Dark mode background */
+.dark-mode .main-content {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.dark-mode {
+  background-color: red !important;
 }
 
 .App-link {

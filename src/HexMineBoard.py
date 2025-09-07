@@ -33,7 +33,7 @@ class HexagonGrid:
         # Get rid of cells inside hexagon that dont exist (kind of on imaginary plane)
         for row in range(self.rows):
             for column in range(self.columns):
-                if (row + column) % 2 == 0:
+                if (row + column) % 2 == self.sideLength%2:
                     self.grid[column][row].outOfBounds = 1
 
         # Assign codes to valid cells
@@ -323,36 +323,12 @@ class HexagonGrid:
             print("yeah")
 
 
-    # def __repr__(self):
-    #     return '\n'.join([' '.join([str(self.grid[row][col]) for col in range(self.num_cols)]) for row in range(self.num_rows)])
-
-    # def __str__(self):
-    #     """
-    #     Return a user-friendly string representation of the grid.
-    #     """
-    #     return '\n'.join([f"Row {row}: " + ', '.join([f"({self.grid[row][col].row}, {self.grid[row][col].col})" for col in range(self.num_cols)]) for row in range(self.num_rows)])
-
-    # def get_neighbors(self, row, col):
-    #     neighbors = []
-    #     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
-    #     for dr, dc in directions:
-    #         new_row, new_col = row + dr, col + dc
-    #         if 0 <= new_row < self.num_rows and 0 <= new_col < self.num_cols:
-    #             neighbors.append(self.grid[new_row][new_col])
-    #     return neighbors
-
-sure = HexagonGrid(6)
+sure = HexagonGrid(5)
 
 print(sure.numCells)
 
-x = input("Column Number: ")
-column = int(x)
-
-x = input("\nRow Number: ")
-row = int(x)
-
-sure.generateMines(column, row)
-sure.singleClickCell(column, row)
+sure.generateMines(5, 8)
+sure.singleClickCell(5, 8)
 sure.printTest()
 
 # sure.print()
