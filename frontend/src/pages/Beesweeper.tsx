@@ -70,6 +70,12 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
       }
     }
 
+    if (gameState === "IP") {
+      timerRef.current = setInterval(() => {
+        setTime((prev) => prev + 1);
+      }, 1000);
+    }
+
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
