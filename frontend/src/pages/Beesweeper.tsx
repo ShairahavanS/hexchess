@@ -23,10 +23,11 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   const [board, setBoard] = useState<MineCellInfo[]>([]);
   const [gameID, setGameID] = useState<string>("");
   const [gameState, setGameState] = useState("");
-  const timerRef = useRef<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    api.post("/beesweeper_api/start/", { level })
+    api
+      .post("/beesweeper_api/start/", { level })
       .then((response) => {
         console.log("Start Response:", response.data);
         setBoard(response.data.board);
