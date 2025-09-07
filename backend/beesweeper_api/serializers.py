@@ -16,7 +16,7 @@ class CellSerializer(serializers.ModelSerializer):
 
 # Optimized Game serializer
 class GameSerializer(serializers.ModelSerializer):
-    board = CellSerializer(many=True)
+    board = serializers.SerializerMethodField()
 
     class Meta:
         model = Game
@@ -24,6 +24,13 @@ class GameSerializer(serializers.ModelSerializer):
             "game_ID",
             "progress",
             "level",
+            "mines",
             "flags",
+            "numberRevealed",
             "board",
         ]
+
+    def get_board(self, obj):
+        # Only include non-out-of-bounds cells
+        valid_cells = obj.board.filter(outofBounds=False)
+        return CellSerializer(valid_cells, many=True, context={"game": obj}).data
