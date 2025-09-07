@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import checkerPiece from "../images/checkerPieces/Red Checker Piece.svg";
 import chessPiece from "../images/chessPieces/Chess_rdt45.svg";
-import bee from "../images/beesweeper/Hex Bee.svg";
+import bee from "../images/beesweeper/HexBee.svg";
 import "./Home.css";
 
 interface HomeProps {
