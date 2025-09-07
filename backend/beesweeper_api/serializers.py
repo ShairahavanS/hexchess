@@ -1,16 +1,29 @@
 from rest_framework import serializers
 from .models import Game, Cell
 
-# Serializer for the Cell model
+# Optimized Cell serializer
 class CellSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cell
-        fields = '__all__'
+        fields = [
+            "key",
+            "mine",
+            "revealed",
+            "flagged",
+            "adjacent",
+            "honey",
+        ]
 
-# Serializer for the Game model
+# Optimized Game serializer
 class GameSerializer(serializers.ModelSerializer):
     board = CellSerializer(many=True)
 
     class Meta:
         model = Game
-        fields = '__all__'
+        fields = [
+            "game_ID",
+            "progress",
+            "level",
+            "flags",
+            "board",
+        ]
