@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import "./Cell.css";
 import "../CellBorder/CellBorder.css"; // Merge CSS files or keep separate
-import bee from "../images/beesweeper/Hex Bee.svg";
+import bee from "../images/beesweeper/HexBee.svg";
 import flag from "../images/beesweeper/Flag.svg";
-import one from "../images/beesweeper/Number 1.svg";
-import two from "../images/beesweeper/Number 2.svg";
-import three from "../images/beesweeper/Number 3.svg";
-import four from "../images/beesweeper/Number 4.svg";
-import five from "../images/beesweeper/Number 5.svg";
-import six from "../images/beesweeper/Number 6.svg";
+import one from "../images/beesweeper/Number1.svg";
+import two from "../images/beesweeper/Number2.svg";
+import three from "../images/beesweeper/Number3.svg";
+import four from "../images/beesweeper/Number4.svg";
+import five from "../images/beesweeper/Number5.svg";
+import six from "../images/beesweeper/Number6.svg";
 import honey from "../images/beesweeper/Honey.svg";
 import axios from "axios";
 import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
@@ -34,8 +34,8 @@ interface CellProps {
   cellData?: MineCellInfo;
   onUpdateBoard?: (newBoard: MineCellInfo[]) => void;
   onUpdateFlags?: (newFlags: number) => void;
-  withBorder?: boolean; 
-  borderStyle?: React.CSSProperties; 
+  withBorder?: boolean;
+  borderStyle?: React.CSSProperties;
 }
 
 const Cell: React.FC<CellProps> = ({
