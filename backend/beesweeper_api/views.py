@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Game, Cell
-from .serializers import GameSerializer, CellSerializer
+from .serializers import GameSerializer, CellSerializer, GameSingleMoveSerializer
 import random
 import uuid
 
@@ -28,9 +28,10 @@ class SingleClickGame(APIView):
         key = request.query_params.get('key', request.data.get('key'))
 
         if game.progress == 'NS' or game.progress == 'IP':
+            game.start_change_tracking()
             game.singleClickCell(str(key)) 
 
-        serializer = GameSerializer(game)
+        serializer = GameSingleMoveSerializer(game)
         return Response(serializer.data)
     
     
@@ -45,9 +46,10 @@ class DoubleClickGame(APIView):
         key = request.data.get('key')
 
         if game.progress == 'NS' or game.progress == 'IP':
+            game.start_change_tracking()
             game.doubleClickCell(key)
 
-        serializer = GameSerializer(game)
+        serializer = GameSingleMoveSerializer(game)
         return Response(serializer.data)
     
 class FlagGame(APIView):
@@ -60,9 +62,10 @@ class FlagGame(APIView):
         game = get_object_or_404(Game, game_ID=game_ID)
         key = request.data.get('key')
 
+        game.start_change_tracking()
         game.flagCell(int(key))
 
-        serializer = GameSerializer(game)
+        serializer = GameSingleMoveSerializer(game)
         return Response(serializer.data)
 
 class ResetGame(APIView):
@@ -73,11 +76,12 @@ class ResetGame(APIView):
     
     def post(self, request, game_ID, format=None):
         game = get_object_or_404(Game, game_ID=game_ID)
-
+        
+        game.start_change_tracking()
         game.reset_game()
         game.save()
 
-        serializer = GameSerializer(game)
+        serializer = GameSingleMoveSerializer(game)
         return Response(serializer.data)
     
 class DeleteGame(APIView):

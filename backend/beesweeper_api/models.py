@@ -41,6 +41,15 @@ class Game(models.Model):
     key_map = models.JSONField(default=dict)  # Use JSONField for key_map
     reverse_key_map = models.JSONField(default=dict)
     board = models.ManyToManyField(Cell)
+
+    def start_change_tracking(self):
+        self._changed_cells = set()
+
+    def mark_changed(self, cell):
+        self._changed_cells.add(cell.id)
+
+    def get_changed_cells(self):
+        return self.board.filter(id__in=self._changed_cells)
     
     def deleteCells(self):
         self.board.clear()
@@ -279,6 +288,7 @@ class Game(models.Model):
             
             self.save()
             cell.flagged = not cell.flagged
+            self.mark_changed(cell)
             cell.save()
     
     def gameLost(self):
@@ -290,6 +300,7 @@ class Game(models.Model):
             cell = self.board.filter(column=columnNumber, row=rowNumber).first()
             cell.flagged = False
             cell.revealed = True
+            self.mark_changed(cell)
             cell.save()
 
         self.progress = 'LOST'
@@ -308,6 +319,7 @@ class Game(models.Model):
                 if cell:  # Guard against None
                     cell.honey = True
                     cell.revealed = False
+                    self.mark_changed(cell)
                     cell.save()
 
             self.save()
@@ -330,6 +342,7 @@ class Game(models.Model):
         elif cell.revealed == False:
             
             cell.revealed = True
+            self.mark_changed(cell)
             cell.save()
             self.numberRevealed -= 1
 

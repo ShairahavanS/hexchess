@@ -12,7 +12,6 @@ interface GridProps {
   board: MineCellInfo[];
   onUpdateBoard?: (newBoard: MineCellInfo[]) => void;
   onUpdateFlags: (newFlags: number) => void;
-  onUpdateGameState?: (newState: string) => void;
 }
 
 function Grid({
@@ -21,7 +20,6 @@ function Grid({
   board,
   onUpdateBoard,
   onUpdateFlags,
-  onUpdateGameState,
 }: GridProps) {
   const divs: JSX.Element[] = [];
   const width = (2 * 100.0) / (3 * sideLength - 1); // This should give consistent width
@@ -58,7 +56,6 @@ function Grid({
             cellData={cellData}
             onUpdateBoard={onUpdateBoard}
             onUpdateFlags={onUpdateFlags}
-            onUpdateGameState={onUpdateGameState}
           />
           {/* <h1 style={{ color: "red" }}>{cellData?.revealed ? 1 : 0}</h1> */}
         </div>
@@ -105,7 +102,6 @@ function Grid({
             cellID={count}
             cellData={cellData}
             onUpdateBoard={onUpdateBoard}
-            onUpdateGameState={onUpdateGameState}
           />
         </div>
       );

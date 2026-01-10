@@ -22,8 +22,7 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   const [board, setBoard] = useState<MineCellInfo[]>([]);
   const [gameID, setGameID] = useState<string>("");
   const [gameState, setGameState] = useState("");
-
-  const [startTime, setStartTime] = useState<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     api
@@ -36,12 +35,6 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
         if (response.data.flags !== undefined) {
           setFlags(response.data.flags);
         }
-
-        if (response.data.progress === "IP") {
-          setStartTime(Date.now());
-        } else {
-          setStartTime(null);
-        }
       })
       .catch((error) => {
         console.error(
@@ -50,6 +43,45 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
         );
       });
   }, [level]);
+
+  useEffect(() => {
+    if (gameState === "IP") {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+
+    // Stop timer when game ends
+    if (gameState === "WIN" || gameState === "LOSS") {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+
+    // Reset timer when game not started or level changes
+    if (gameState === "NS") {
+      setTime(0);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+
+    if (gameState === "IP") {
+      timerRef.current = setInterval(() => {
+        setTime((prev) => prev + 1);
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [gameState]);
 
   useEffect(() => {
     switch (level) {
@@ -77,9 +109,22 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
         setSides(6);
         setFlags(18);
     }
-    setTime(0);
-    setStartTime(null);
   }, [level]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (gameID && gameState !== "WIN" && gameState !== "LOST") {
+        api
+          .get(`/beesweeper_api/${gameID}/single/`)
+          .then((response) => {
+            setGameState(response.data.progress);
+          })
+          .catch(console.error);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [gameID, gameState]);
 
   useEffect(() => {
     if (gameState === "NS") {
@@ -108,33 +153,8 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
           setFlags(18);
           setTime(0);
       }
-
-      setTime(0);
-      setStartTime(null);
     }
   }, [gameState, level]);
-
-  // TIMER EFFECT
-  useEffect(() => {
-    // Only run timer if game is in progress
-    if (gameState !== "IP") {
-      setStartTime(null); // stop timer if not in progress
-      return;
-    }
-
-    // Record startTime if not already set
-    if (!startTime) setStartTime(Date.now());
-
-    // Tick every second
-    const interval = setInterval(() => {
-      if (startTime) {
-        setTime(Math.floor((Date.now() - startTime) / 1000));
-      }
-    }, 1000);
-
-    // Cleanup interval when effect re-runs or component unmounts
-    return () => clearInterval(interval);
-  }, [gameState, startTime]);
 
   const handleReset = () => {
     setTime(0);
@@ -147,14 +167,8 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
         setBoard(response.data.board);
         setGameID(response.data.game_ID);
         setGameState(response.data.progress);
-        setTime(0);
-        setStartTime(null);
         if (response.data.flags !== undefined) {
           setFlags(response.data.flags);
-        }
-
-        if (response.data.progress === "IP") {
-          setStartTime(Date.now());
         }
       })
       .catch((error) => {
@@ -186,7 +200,6 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
             board={board}
             onUpdateBoard={setBoard}
             onUpdateFlags={setFlags}
-            onUpdateGameState={setGameState}
           />
         </div>
       </div>

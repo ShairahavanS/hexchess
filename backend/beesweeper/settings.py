@@ -20,12 +20,14 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME")
 
 ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "[::1]",
+
     ".onrender.com",
     ".vercel.app",
     ".netlify.app",
     "ShairahavanS.github.io",  
-    "localhost",
-    "127.0.0.1",
 ]
 
 # Application definition
@@ -106,11 +108,19 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # CORS / CSRF
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  
+    "http://127.0.0.1:8000",
+
     "https://hexchess-ten.vercel.app",
     "https://ShairahavanS.github.io",
+
 ]
 
+
 CSRF_TRUSTED_ORIGINS = [
+    "http://localhost",
+    "http://127.0.0.1",
+
     "https://hexagonal-games-backend.onrender.com",
     "https://hexchess-ten.vercel.app",
     "https://ShairahavanS.github.io",

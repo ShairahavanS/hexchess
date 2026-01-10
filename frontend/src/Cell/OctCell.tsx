@@ -33,7 +33,6 @@ interface CellProps {
   cellData?: MineCellInfo;
   onUpdateBoard?: (newBoard: MineCellInfo[]) => void;
   onUpdateFlags?: (newFlags: number) => void;
-  onUpdateGameState?: (newState: string) => void;
   withBorder?: boolean;
   borderStyle?: React.CSSProperties;
 }
@@ -44,7 +43,6 @@ const Cell: React.FC<CellProps> = ({
   cellData,
   onUpdateBoard,
   onUpdateFlags,
-  onUpdateGameState,
   withBorder = false,
   borderStyle,
 }) => {
@@ -71,17 +69,12 @@ const Cell: React.FC<CellProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (cellData?.revealed) return;
-  
+
     api
-      .post(`/beesweeper_api/${gameID}/single/`, { key: cellID })
-      .then((response) => {
-        onUpdateBoard?.(response.data.board);
-  
-        // Pass gameState up to parent
-        if (response.data.progress) {
-          onUpdateGameState?.(response.data.progress); // <-- here
-        }
+      .post(`/beesweeper_api/${gameID}/single/`, {
+        key: cellID,
       })
+      .then((response) => onUpdateBoard?.(response.data.board))
       .catch((error) => console.error("Error clicking cell:", error));
   };
 
