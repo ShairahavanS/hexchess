@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Game, Cell
-from .serializers import GameSerializer, CellSerializer, GameSingleMoveSerializer
+from .serializers import GameSerializer, CellSerializer, GameSingleMoveSerializer, GameInitSerializer
 import random
 import uuid
 
@@ -14,7 +14,7 @@ class StartGame(APIView):
         game.create_board()
         game.save()
 
-        serializer = GameSerializer(game)
+        serializer = GameInitSerializer(game)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class SingleClickGame(APIView):
@@ -81,7 +81,7 @@ class ResetGame(APIView):
         game.reset_game()
         game.save()
 
-        serializer = GameSerializer(game)
+        serializer = GameInitSerializer(game)
         return Response(serializer.data)
     
 class DeleteGame(APIView):

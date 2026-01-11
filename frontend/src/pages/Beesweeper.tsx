@@ -10,6 +10,8 @@ export const api = axios.create({
   baseURL: BACKEND_URL,
 });
 
+// self.numCells = ((self.sideLength * 2 - 2) * (self.sideLength * 2 - 1) - (self.sideLength) * (self.sideLength - 1)) + 2 * self.sideLength - 1
+
 interface BeesweeperProps {
   darkMode: boolean;
 }
@@ -17,6 +19,7 @@ interface BeesweeperProps {
 const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   const [level, setLevel] = useState("Easy");
   const [sides, setSides] = useState(6);
+  const [numCells, setNumCells] = useState(91);
   const [flags, setFlags] = useState(18);
   const [time, setTime] = useState(0);
   const [board, setBoard] = useState<MineCellInfo[]>([]);
@@ -27,6 +30,26 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
 
   // Replace entire board (start/reset)
   const replaceBoard = (newBoard: MineCellInfo[]) => {
+    setBoard(newBoard);
+  };
+
+  const getSides = (level: string) => {
+    switch (level) {
+      case "Easy": return 6;
+      case "Medium": return 10;
+      case "Hard": return 16;
+      case "Extreme": return 24;
+      case "Impossible": return 50;
+      default: return 6;
+    }
+  };
+
+  const initBoard = (size: number) => {
+    const totalCells = numCells; // approximate for hex grid
+    const newBoard: MineCellInfo[] = Array.from({ length: totalCells }, (_, i) => ({
+      key: i + 1,
+      kind: "hidden",
+    }));
     setBoard(newBoard);
   };
 
@@ -43,48 +66,31 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
     });
   };
 
-  useEffect(() => {
-    api.post("/beesweeper_api/start/", { level }).then((response) => {
-      replaceBoard(response.data.board); // 🔴 replace, not merge
-      setGameID(response.data.game_ID);
-      setGameState(response.data.progress);
+  const startGame = () => {
+    api.post("/beesweeper_api/start/", { level }).then((res) => {
+      const newSides = getSides(level);
+      setSides(newSides); // set sides immediately
+      const totalCells = ((newSides * 2 - 2) * (newSides * 2 - 1) - newSides * (newSides - 1)) + 2 * newSides - 1;
+      setNumCells(totalCells);
   
-      if (response.data.flags !== undefined) {
-        setFlags(response.data.flags);
-      }
+      setGameID(res.data.game_ID); // ✅ set gameID from backend
+      setGameState(res.data.progress);
+      setFlags(res.data.flags ?? flags);
   
-      setStartTime(response.data.progress === "IP" ? Date.now() : null);
+      // Lazy revelation: all hidden
+      const hiddenBoard: MineCellInfo[] = Array.from({ length: totalCells }, (_, i) => ({
+        key: i + 1,
+        kind: "hidden",
+      }));
+      setBoard(hiddenBoard);
+  
+      setStartTime(res.data.progress === "IP" ? Date.now() : null);
+      setTime(0);
     });
-  }, [level]);
+  };
 
   useEffect(() => {
-    switch (level) {
-      case "Easy":
-        setSides(6);
-        setFlags(18);
-        break;
-      case "Medium":
-        setSides(10);
-        setFlags(54);
-        break;
-      case "Hard":
-        setSides(16);
-        setFlags(144);
-        break;
-      case "Extreme":
-        setSides(24);
-        setFlags(331);
-        break;
-      case "Impossible":
-        setSides(50);
-        setFlags(1470);
-        break;
-      default:
-        setSides(6);
-        setFlags(18);
-    }
-    setTime(0);
-    setStartTime(null);
+    startGame(); // start new game whenever level changes
   }, [level]);
 
   useEffect(() => {
@@ -114,9 +120,9 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
           setFlags(18);
           setTime(0);
       }
-
+      
+      setNumCells(((sides * 2 - 2) * (sides * 2 - 1) - (sides) * (sides - 1)) + 2 * sides - 1);
       setTime(0);
-      setStartTime(null);
     }
   }, [gameState, level]);
 
@@ -142,15 +148,23 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
     return () => clearInterval(interval);
   }, [gameState, startTime]);
 
+
+
+
   const handleReset = () => {
-    setTime(0);
+    if (!gameID) return;
   
-    api.post(`/beesweeper_api/${gameID}/reset/`).then((response) => {
-      replaceBoard(response.data.board); // 🔴 FULL RESET
-      setGameID(response.data.game_ID);
-      setGameState(response.data.progress);
-      setFlags(response.data.flags ?? flags);
-      setStartTime(response.data.progress === "IP" ? Date.now() : null);
+    api.post(`/beesweeper_api/${gameID}/reset/`).then((res) => {
+      // stop any ongoing timer immediately
+      setStartTime(res.data.progress === "IP" ? Date.now() : null);
+      setTime(0);
+  
+      // lazy reset board
+      setBoard((prev) => prev.map((c) => ({ key: c.key, kind: "hidden" })));
+      setFlags(res.data.flags ?? flags);
+  
+      // set game state last to trigger timer effect
+      setGameState(res.data.progress);
     });
   };
 

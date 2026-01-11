@@ -565,5 +565,5 @@ class Game(models.Model):
                             tempkey = cell.key
                             self.singleClickCell(tempkey)
                     
-                    self.checkWon()
-                    self.save()
+            self.checkWon()
+            self.save()

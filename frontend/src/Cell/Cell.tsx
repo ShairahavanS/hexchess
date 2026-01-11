@@ -55,7 +55,7 @@ const Cell: React.FC<CellProps> = ({
 
   const displayState = (() => {
     if (!cellData) return CellState.Unbroken;
-  
+
     switch (cellData.kind) {
       case "hidden":
         return CellState.Unbroken;
@@ -76,30 +76,33 @@ const Cell: React.FC<CellProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (displayState != CellState.Unbroken) return;
-  
-    api.post(`/beesweeper_api/${gameID}/single/`, { key: cellID })
-    .then((response) => {
-      onUpdateBoard?.(response.data.board); // 🔴 JUST SEND DELTAS
 
-      if (response.data.progress) {
-        onUpdateGameState?.(response.data.progress);
-      }
-    });
+    api
+      .post(`/beesweeper_api/${gameID}/single/`, { key: cellID })
+      .then((response) => {
+        onUpdateBoard?.(response.data.board); // 🔴 JUST SEND DELTAS
+
+        if (response.data.progress) {
+          onUpdateGameState?.(response.data.progress);
+        }
+      });
   };
 
   /** Handle right-click (flag) */
   const handleRightClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (displayState != CellState.Unbroken && displayState != CellState.Flagged) return;
+    if (displayState != CellState.Unbroken && displayState != CellState.Flagged)
+      return;
 
-    api.post(`/beesweeper_api/${gameID}/flag/`, { key: cellID })
-    .then((response) => {
-      onUpdateBoard?.(response.data.board);
+    api
+      .post(`/beesweeper_api/${gameID}/flag/`, { key: cellID })
+      .then((response) => {
+        onUpdateBoard?.(response.data.board);
 
-      if (response.data.flags !== undefined) {
-        onUpdateFlags?.(response.data.flags);
-      }
-    });
+        if (response.data.flags !== undefined) {
+          onUpdateFlags?.(response.data.flags);
+        }
+      });
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -118,12 +121,17 @@ const Cell: React.FC<CellProps> = ({
   };
 
   const triggerDoubleClickAction = () => {
-    if (displayState == CellState.Unbroken) return;
+    if (displayState === CellState.Unbroken) return;
 
-    api.post(`/beesweeper_api/${gameID}/double/`, { key: cellID })
-    .then((response) => {
-      onUpdateBoard?.(response.data.board);
-    });
+    api
+      .post(`/beesweeper_api/${gameID}/double/`, { key: cellID })
+      .then((response) => {
+        onUpdateBoard?.(response.data.board);
+
+        if (response.data.progress) {
+          onUpdateGameState?.(response.data.progress);
+        }
+      });
   };
 
   /** Render image based on displayState */
@@ -137,23 +145,23 @@ const Cell: React.FC<CellProps> = ({
         return <img className="flag" src={flag} alt="Flag" />;
       case CellState.Bee:
         return <img className="bee" src={bee} alt="Bee" />;
-        case CellState.Numbered:
-          switch (cellData.kind) {
-            case "1":
-              return <img className="number" src={one} alt="1" />;
-            case "2":
-              return <img className="number" src={two} alt="2" />;
-            case "3":
-              return <img className="number" src={three} alt="3" />;
-            case "4":
-              return <img className="number" src={four} alt="4" />;
-            case "5":
-              return <img className="number" src={five} alt="5" />;
-            case "6":
-              return <img className="number" src={six} alt="6" />;
-            default:
-              return null;
-          }
+      case CellState.Numbered:
+        switch (cellData.kind) {
+          case "1":
+            return <img className="number" src={one} alt="1" />;
+          case "2":
+            return <img className="number" src={two} alt="2" />;
+          case "3":
+            return <img className="number" src={three} alt="3" />;
+          case "4":
+            return <img className="number" src={four} alt="4" />;
+          case "5":
+            return <img className="number" src={five} alt="5" />;
+          case "6":
+            return <img className="number" src={six} alt="6" />;
+          default:
+            return null;
+        }
       case CellState.Empty:
         return <div className="empty-cell" />;
       default:
