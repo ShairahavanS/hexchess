@@ -25,30 +25,36 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
 
   const [startTime, setStartTime] = useState<number | null>(null);
 
-  useEffect(() => {
-    api
-      .post("/beesweeper_api/start/", { level })
-      .then((response) => {
-        console.log("Start Response:", response.data);
-        setBoard(response.data.board);
-        setGameID(response.data.game_ID);
-        setGameState(response.data.progress);
-        if (response.data.flags !== undefined) {
-          setFlags(response.data.flags);
-        }
+  // Replace entire board (start/reset)
+  const replaceBoard = (newBoard: MineCellInfo[]) => {
+    setBoard(newBoard);
+  };
 
-        if (response.data.progress === "IP") {
-          setStartTime(Date.now());
-        } else {
-          setStartTime(null);
-        }
-      })
-      .catch((error) => {
-        console.error(
-          "Error starting game:",
-          error.response ? error.response.data : error.message
-        );
+  // Merge only changed cells (click/flag)
+  const mergeBoardChanges = (changedCells: MineCellInfo[]) => {
+    setBoard((prev) => {
+      const map = new Map(prev.map((c) => [c.key, c]));
+
+      changedCells.forEach((cell) => {
+        map.set(cell.key, cell); // overwrite changed cell
       });
+
+      return Array.from(map.values());
+    });
+  };
+
+  useEffect(() => {
+    api.post("/beesweeper_api/start/", { level }).then((response) => {
+      replaceBoard(response.data.board); // 🔴 replace, not merge
+      setGameID(response.data.game_ID);
+      setGameState(response.data.progress);
+  
+      if (response.data.flags !== undefined) {
+        setFlags(response.data.flags);
+      }
+  
+      setStartTime(response.data.progress === "IP" ? Date.now() : null);
+    });
   }, [level]);
 
   useEffect(() => {
@@ -138,31 +144,14 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
 
   const handleReset = () => {
     setTime(0);
-    console.log("Game Reset");
-
-    api
-      .post(`/beesweeper_api/${gameID}/reset/`)
-      .then((response) => {
-        console.log("Start Response:", response.data);
-        setBoard(response.data.board);
-        setGameID(response.data.game_ID);
-        setGameState(response.data.progress);
-        setTime(0);
-        setStartTime(null);
-        if (response.data.flags !== undefined) {
-          setFlags(response.data.flags);
-        }
-
-        if (response.data.progress === "IP") {
-          setStartTime(Date.now());
-        }
-      })
-      .catch((error) => {
-        console.error(
-          "Error starting game:",
-          error.response ? error.response.data : error.message
-        );
-      });
+  
+    api.post(`/beesweeper_api/${gameID}/reset/`).then((response) => {
+      replaceBoard(response.data.board); // 🔴 FULL RESET
+      setGameID(response.data.game_ID);
+      setGameState(response.data.progress);
+      setFlags(response.data.flags ?? flags);
+      setStartTime(response.data.progress === "IP" ? Date.now() : null);
+    });
   };
 
   let ratio = ((2 * sides - 1) / (3 * sides - 1)) * Math.sqrt(3);
@@ -184,7 +173,7 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
             level={level}
             game_ID={gameID}
             board={board}
-            onUpdateBoard={setBoard}
+            onUpdateBoard={mergeBoardChanges}
             onUpdateFlags={setFlags}
             onUpdateGameState={setGameState}
           />

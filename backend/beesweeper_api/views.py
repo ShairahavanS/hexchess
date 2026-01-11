@@ -81,7 +81,7 @@ class ResetGame(APIView):
         game.reset_game()
         game.save()
 
-        serializer = GameSingleMoveSerializer(game)
+        serializer = GameSerializer(game)
         return Response(serializer.data)
     
 class DeleteGame(APIView):

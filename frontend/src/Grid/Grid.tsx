@@ -10,7 +10,7 @@ interface GridProps {
   level: string;
   game_ID: string;
   board: MineCellInfo[];
-  onUpdateBoard?: (newBoard: MineCellInfo[]) => void;
+  onUpdateBoard?: (changedCells: MineCellInfo[]) => void;
   onUpdateFlags: (newFlags: number) => void;
   onUpdateGameState?: (newState: string) => void;
 }

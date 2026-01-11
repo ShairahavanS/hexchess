@@ -438,7 +438,9 @@ class Game(models.Model):
                 if cell:
                     flagCount += 1
 
-            if flagCount == clickedCell.adjacent:
+            if flagCount != clickedCell.adjacent:
+                dummy = 0
+            else:
                 incorrectFlag = False
 
                 if rowNumber - 2 >= 0:  # Ensure we don't go out of bounds
@@ -476,92 +478,92 @@ class Game(models.Model):
                     if cell:
                         incorrectFlag = True
 
-            if incorrectFlag:
+                if incorrectFlag:
 
-                if rowNumber - 2 >= 0:  # Ensure we don't go out of bounds
-                    cell = self.board.filter(column=columnNumber, row=rowNumber-2, outofBounds=False, revealed=False).first()
-                    if cell:
-                        cell.revealed = True
-                        cell.save()
+                    if rowNumber - 2 >= 0:  # Ensure we don't go out of bounds
+                        cell = self.board.filter(column=columnNumber, row=rowNumber-2, outofBounds=False, revealed=False).first()
+                        if cell:
+                            cell.revealed = True
+                            cell.save()
 
-                # Down 2 rows
-                if rowNumber + 2 < self.rows:  # Ensure we don't go out of bounds
-                    cell = self.board.filter(column=columnNumber, row=rowNumber+2, outofBounds=False, revealed=False).first()
-                    if cell:
-                        cell.revealed = True
-                        cell.save()
+                    # Down 2 rows
+                    if rowNumber + 2 < self.rows:  # Ensure we don't go out of bounds
+                        cell = self.board.filter(column=columnNumber, row=rowNumber+2, outofBounds=False, revealed=False).first()
+                        if cell:
+                            cell.revealed = True
+                            cell.save()
 
-                # Top-right diagonal (1 row up, 1 column right)
-                if columnNumber + 1 < self.columns and rowNumber - 1 >= 0:  # Check bounds
-                    cell = self.board.filter(column=columnNumber+1, row=rowNumber-1, outofBounds=False, revealed=False).first()
-                    if cell:
-                        cell.revealed = True
-                        cell.save()
+                    # Top-right diagonal (1 row up, 1 column right)
+                    if columnNumber + 1 < self.columns and rowNumber - 1 >= 0:  # Check bounds
+                        cell = self.board.filter(column=columnNumber+1, row=rowNumber-1, outofBounds=False, revealed=False).first()
+                        if cell:
+                            cell.revealed = True
+                            cell.save()
 
-                # Bottom-right diagonal (1 row down, 1 column right)
-                if columnNumber + 1 < self.columns and rowNumber + 1 < self.rows:  # Check bounds
-                    cell = self.board.filter(column=columnNumber+1, row=rowNumber+1, outofBounds=False, revealed=False).first()
-                    if cell:
-                        cell.revealed = True
-                        cell.save()
+                    # Bottom-right diagonal (1 row down, 1 column right)
+                    if columnNumber + 1 < self.columns and rowNumber + 1 < self.rows:  # Check bounds
+                        cell = self.board.filter(column=columnNumber+1, row=rowNumber+1, outofBounds=False, revealed=False).first()
+                        if cell:
+                            cell.revealed = True
+                            cell.save()
 
-                # Top-left diagonal (1 row up, 1 column left)
-                if columnNumber - 1 >= 0 and rowNumber - 1 >= 0:  # Check bounds
-                    cell = self.board.filter(column=columnNumber-1, row=rowNumber-1, outofBounds=False, revealed=False).first()
-                    if cell:
-                        cell.revealed = True
-                        cell.save()
+                    # Top-left diagonal (1 row up, 1 column left)
+                    if columnNumber - 1 >= 0 and rowNumber - 1 >= 0:  # Check bounds
+                        cell = self.board.filter(column=columnNumber-1, row=rowNumber-1, outofBounds=False, revealed=False).first()
+                        if cell:
+                            cell.revealed = True
+                            cell.save()
 
-                # Bottom-left diagonal (1 row down, 1 column left)
-                if columnNumber - 1 >= 0 and rowNumber + 1 < self.rows:  # Check bounds
-                    cell = self.board.filter(column=columnNumber-1, row=rowNumber+1, outofBounds=False, revealed=False).first()
-                    if cell:
-                        cell.revealed = True
-                        cell.save()
+                    # Bottom-left diagonal (1 row down, 1 column left)
+                    if columnNumber - 1 >= 0 and rowNumber + 1 < self.rows:  # Check bounds
+                        cell = self.board.filter(column=columnNumber-1, row=rowNumber+1, outofBounds=False, revealed=False).first()
+                        if cell:
+                            cell.revealed = True
+                            cell.save()
 
-                self.gameLost()
+                    self.gameLost()
 
-            else:
-                if rowNumber - 2 >= 0:  # Ensure we don't go out of bounds
-                    cell = self.board.filter(column=columnNumber, row=rowNumber-2, outofBounds=False, flagged=False, revealed=False).first()
-                    if cell:
-                        tempkey = cell.key
-                        self.singleClickCell(tempkey)
+                else:
+                    if rowNumber - 2 >= 0:  # Ensure we don't go out of bounds
+                        cell = self.board.filter(column=columnNumber, row=rowNumber-2, outofBounds=False, flagged=False, revealed=False).first()
+                        if cell:
+                            tempkey = cell.key
+                            self.singleClickCell(tempkey)
 
-                # Down 2 rows
-                if rowNumber + 2 < self.rows:  # Ensure we don't go out of bounds
-                    cell = self.board.filter(column=columnNumber, row=rowNumber+2, outofBounds=False, flagged=False, revealed=False).first()
-                    if cell:
-                        tempkey = cell.key
-                        self.singleClickCell(tempkey)
+                    # Down 2 rows
+                    if rowNumber + 2 < self.rows:  # Ensure we don't go out of bounds
+                        cell = self.board.filter(column=columnNumber, row=rowNumber+2, outofBounds=False, flagged=False, revealed=False).first()
+                        if cell:
+                            tempkey = cell.key
+                            self.singleClickCell(tempkey)
 
-                # Top-right diagonal (1 row up, 1 column right)
-                if columnNumber + 1 < self.columns and rowNumber - 1 >= 0:  # Check bounds
-                    cell = self.board.filter(column=columnNumber+1, row=rowNumber-1, outofBounds=False, flagged=False, revealed=False).first()
-                    if cell:
-                        tempkey = cell.key
-                        self.singleClickCell(tempkey)
+                    # Top-right diagonal (1 row up, 1 column right)
+                    if columnNumber + 1 < self.columns and rowNumber - 1 >= 0:  # Check bounds
+                        cell = self.board.filter(column=columnNumber+1, row=rowNumber-1, outofBounds=False, flagged=False, revealed=False).first()
+                        if cell:
+                            tempkey = cell.key
+                            self.singleClickCell(tempkey)
 
-                # Bottom-right diagonal (1 row down, 1 column right)
-                if columnNumber + 1 < self.columns and rowNumber + 1 < self.rows:  # Check bounds
-                    cell = self.board.filter(column=columnNumber+1, row=rowNumber+1, outofBounds=False, flagged=False, revealed=False).first()
-                    if cell:
-                        tempkey = cell.key
-                        self.singleClickCell(tempkey)
+                    # Bottom-right diagonal (1 row down, 1 column right)
+                    if columnNumber + 1 < self.columns and rowNumber + 1 < self.rows:  # Check bounds
+                        cell = self.board.filter(column=columnNumber+1, row=rowNumber+1, outofBounds=False, flagged=False, revealed=False).first()
+                        if cell:
+                            tempkey = cell.key
+                            self.singleClickCell(tempkey)
 
-                # Top-left diagonal (1 row up, 1 column left)
-                if columnNumber - 1 >= 0 and rowNumber - 1 >= 0:  # Check bounds
-                    cell = self.board.filter(column=columnNumber-1, row=rowNumber-1, outofBounds=False, flagged=False, revealed=False).first()
-                    if cell:
-                        tempkey = cell.key
-                        self.singleClickCell(tempkey)
+                    # Top-left diagonal (1 row up, 1 column left)
+                    if columnNumber - 1 >= 0 and rowNumber - 1 >= 0:  # Check bounds
+                        cell = self.board.filter(column=columnNumber-1, row=rowNumber-1, outofBounds=False, flagged=False, revealed=False).first()
+                        if cell:
+                            tempkey = cell.key
+                            self.singleClickCell(tempkey)
 
-                # Bottom-left diagonal (1 row down, 1 column left)
-                if columnNumber - 1 >= 0 and rowNumber + 1 < self.rows:  # Check bounds
-                    cell = self.board.filter(column=columnNumber-1, row=rowNumber+1, outofBounds=False, flagged=False, revealed=False).first()
-                    if cell:
-                        tempkey = cell.key
-                        self.singleClickCell(tempkey)
-
-        self.checkWon()
-        self.save()
+                    # Bottom-left diagonal (1 row down, 1 column left)
+                    if columnNumber - 1 >= 0 and rowNumber + 1 < self.rows:  # Check bounds
+                        cell = self.board.filter(column=columnNumber-1, row=rowNumber+1, outofBounds=False, flagged=False, revealed=False).first()
+                        if cell:
+                            tempkey = cell.key
+                            self.singleClickCell(tempkey)
+                    
+                    self.checkWon()
+                    self.save()

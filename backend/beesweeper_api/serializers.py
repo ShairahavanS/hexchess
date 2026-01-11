@@ -3,15 +3,44 @@ from .models import Game, Cell
 
 # Optimized Cell serializer
 class CellSerializer(serializers.ModelSerializer):
+    kind = serializers.SerializerMethodField()
+
     class Meta:
         model = Cell
+        fields = ["key", "kind"]
+
+    def get_kind(self, obj):
+
+        if obj.honey:
+            return "honey"
+        
+        # Flagged always wins
+        if obj.flagged:
+            return "flag"
+
+        # Unrevealed cells should reveal NOTHING
+        if not obj.revealed and not obj.honey:
+            return "hidden"
+
+        # Revealed cells
+
+        if obj.mine:
+            return "mine"
+        
+
+        # Numbered cell (0–8)
+        return str(obj.adjacent)
+
+class GameInitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Game
         fields = [
-            "key",
-            "mine",
-            "revealed",
-            "flagged",
-            "adjacent",
-            "honey",
+            "game_ID",
+            "progress",
+            "level",
+            "mines",
+            "flags",
+            "numberRevealed",
         ]
 
 # Optimized Game serializer
