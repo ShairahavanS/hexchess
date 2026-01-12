@@ -37,9 +37,9 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
     switch (level) {
       case "Easy": return 6;
       case "Medium": return 10;
-      case "Hard": return 16;
-      case "Extreme": return 24;
-      case "Impossible": return 50;
+      case "Hard": return 14;
+      case "Extreme": return 18;
+      case "Impossible": return 24;
       default: return 6;
     }
   };
@@ -105,15 +105,15 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
           setTime(0);
           break;
         case "Hard":
-          setFlags(144);
+          setFlags(109);
           setTime(0);
           break;
         case "Extreme":
-          setFlags(331);
+          setFlags(183);
           setTime(0);
           break;
         case "Impossible":
-          setFlags(1470);
+          setFlags(331);
           setTime(0);
           break;
         default:

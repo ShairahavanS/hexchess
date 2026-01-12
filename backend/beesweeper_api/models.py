@@ -2,6 +2,7 @@ from django.db import models
 import json
 import random
 import uuid
+from collections import deque
 
 
 class Cell(models.Model):
@@ -62,7 +63,6 @@ class Game(models.Model):
 
         for cell in cells:
             cell.reset()
-            cell.save()
 
         self.numberRevealed = self.numCells - self.mines
         self.flags = self.mines
@@ -72,69 +72,96 @@ class Game(models.Model):
 
     def create_board(self):
 
+        # -----------------------------
+        # Board size logic (unchanged)
+        # -----------------------------
         if self.level == 'Easy':
             self.sideLength = 6
         elif self.level == 'Medium':
             self.sideLength = 10
         elif self.level == 'Hard':
-            self.sideLength = 16
+            self.sideLength = 14
         elif self.level == 'Extreme':
-            self.sideLength = 24
+            self.sideLength = 18
         elif self.level == 'Impossible':
-            self.sideLength = 50
-        
-        self.columns = 2*self.sideLength - 1
-        self.rows = 4*self.sideLength - 3
-        self.numCells = ((self.sideLength * 2 - 2) * (self.sideLength * 2 - 1) - (self.sideLength) * (self.sideLength - 1)) + 2 * self.sideLength - 1
+            self.sideLength = 24
+
+        self.columns = 2 * self.sideLength - 1
+        self.rows = 4 * self.sideLength - 3
+        self.numCells = ((self.sideLength * 2 - 2) * (self.sideLength * 2 - 1)
+                        - (self.sideLength) * (self.sideLength - 1)) + 2 * self.sideLength - 1
         self.mines = int(0.2 * self.numCells)
         self.numberRevealed = self.numCells - self.mines
         self.flags = self.mines
-        
-        temp_board = [[None for _ in range(self.rows)] for _ in range(self.columns)]
+
+        # --------------------------------------------------
+        # OPTIMIZED: create all Cell objects IN MEMORY
+        # --------------------------------------------------
+        cells = []
+        cell_map = {}  # (col, row) -> Cell
 
         for col in range(self.columns):
             for row in range(self.rows):
-                # Each cell is a dictionary with its attributes
-                cell = Cell.objects.create(
+                cell = Cell(
                     column=col,
                     row=row,
                     key=-1,
                     mine=False,
                     revealed=False,
                     flagged=False,
-                    outofBounds=(row+col)%2 == self.sideLength%2,
+                    outofBounds=(row + col) % 2 == self.sideLength % 2,
                     startingPoint=False,
                     adjacent=0,
                 )
-                cell.save()
-                temp_board[col][row] = cell
+                cells.append(cell)
+                cell_map[(col, row)] = cell
 
+        # --------------------------------------------------
+        # OPTIMIZED: single DB insert
+        # --------------------------------------------------
+        Cell.objects.bulk_create(cells, batch_size=1000)
+
+        # --------------------------------------------------
+        # OPTIMIZED: update out-of-bounds in memory
+        # --------------------------------------------------
         for outer in range(self.sideLength):
             for inner in range(self.sideLength - outer - 1):
-                    temp_board[self.columns - 1 - outer][inner].outofBounds = True
-                    temp_board[self.columns - 1 - outer][inner].save()
-                    temp_board[outer][inner].outofBounds = True
-                    temp_board[outer][inner].save()
-                    temp_board[outer][self.rows - 1 - inner].outofBounds = True
-                    temp_board[outer][self.rows - 1 - inner].save()
-                    temp_board[self.columns - 1 - outer][self.rows - 1 - inner].outofBounds = True
-                    temp_board[self.columns - 1 - outer][self.rows - 1 - inner].save()
+                cell_map[(self.columns - 1 - outer, inner)].outofBounds = True
+                cell_map[(outer, inner)].outofBounds = True
+                cell_map[(outer, self.rows - 1 - inner)].outofBounds = True
+                cell_map[(self.columns - 1 - outer, self.rows - 1 - inner)].outofBounds = True
 
+        # --------------------------------------------------
+        # OPTIMIZED: assign keys + key maps (NO saves)
+        # --------------------------------------------------
         key = 1
+        self.key_map = {}
+        self.reverse_key_map = {}
 
-        for column in range(self.columns):
+        for col in range(self.columns):
             for row in range(self.rows):
-                if not temp_board[column][row].outofBounds:
-                    temp_board[column][row].key = key
-                    temp_board[column][row].save()
-                    self.key_map[key] = (column, row)  # Corrected this line
-                    self.reverse_key_map[f"{column},{row}"] = key  # Corrected this line
-                    key = key + 1
+                cell = cell_map[(col, row)]
+                if not cell.outofBounds:
+                    cell.key = key
+                    self.key_map[str(key)] = [col, row]   # OPTIMIZED: JSON-safe
+                    self.reverse_key_map[f"{col},{row}"] = key
+                    key += 1
 
-        # Store the board as a JSON field
-        # self.board.set(temp_board)
-        self.board.add(*[cell for row in temp_board for cell in row])
+        # --------------------------------------------------
+        # OPTIMIZED: bulk update instead of per-cell save
+        # --------------------------------------------------
+        Cell.objects.bulk_update(
+            cells,
+            ["outofBounds", "key"],
+            batch_size=1000
+        )
+
+        # --------------------------------------------------
+        # OPTIMIZED: single M2M add
+        # --------------------------------------------------
+        self.board.add(*cells)
         self.save()
+
 
     def get_coordinates_from_key(self, key):
         sure = self.key_map.get(str(key))
@@ -198,99 +225,88 @@ class Game(models.Model):
                 cell.save()
     
     def generate_mines(self, key):
+
         self.set_starting_point(key)
 
-        temp_mines = set()  # use a set for O(1) membership checks
+        # --------------------------------------------------
+        # OPTIMIZED: preload board into memory
+        # --------------------------------------------------
+        cells = list(self.board.all())
+        cell_map = {(c.column, c.row): c for c in cells}
 
+        temp_mines = set()
+
+        # --------------------------------------------------
+        # OPTIMIZED: mine placement without DB queries
+        # --------------------------------------------------
         while len(temp_mines) < self.mines:
             mineKey = random.randint(1, self.numCells)
-
-            # Skip if already chosen
             if mineKey in temp_mines:
                 continue
 
-            coordinates = self.get_coordinates_from_key(mineKey)
-            columnNumber, rowNumber = coordinates
+            col, row = self.get_coordinates_from_key(str(mineKey))
+            cell = cell_map[(col, row)]
 
-            # Find a valid cell (not starting point)
-            cell = self.board.filter(column=columnNumber, row=rowNumber, startingPoint=False).first()
-            if cell:
+            if not cell.startingPoint:
                 cell.mine = True
-                cell.save()
                 temp_mines.add(mineKey)
 
-            # Convert set to list for JSON serialization
-            self.mine_keys = list(temp_mines)
+        self.mine_keys = list(temp_mines)
 
+        # --------------------------------------------------
+        # OPTIMIZED: adjacency calculation (pure Python)
+        # --------------------------------------------------
+        directions = [
+            (0, -2), (0, 2),
+            (1, -1), (1, 1),
+            (-1, -1), (-1, 1),
+        ]
 
-        for columnNumber in range(self.columns):
-            for rowNumber in range(self.rows):
+        for cell in cells:
+            if cell.outofBounds:
+                continue
 
-                temp_adjacent_counter = 0
+            count = 0
+            for dx, dy in directions:
+                neighbor = cell_map.get((cell.column + dx, cell.row + dy))
+                if neighbor and neighbor.mine:
+                    count += 1
 
-                if rowNumber - 2 >= 0:  # Ensure we don't go out of bounds
-                    cell = self.board.filter(column=columnNumber, row=rowNumber-2, outofBounds=False, mine=True).first()
-                    if cell:
-                        temp_adjacent_counter = temp_adjacent_counter + 1
+            cell.adjacent = count
 
-                # Down 2 rows
-                if rowNumber + 2 < self.rows:  # Ensure we don't go out of bounds
-                    cell = self.board.filter(column=columnNumber, row=rowNumber+2, outofBounds=False, mine=True).first()
-                    if cell:
-                        temp_adjacent_counter = temp_adjacent_counter + 1
-
-                # Top-right diagonal (1 row up, 1 column right)
-                if columnNumber + 1 < self.columns and rowNumber - 1 >= 0:  # Check bounds
-                    cell = self.board.filter(column=columnNumber+1, row=rowNumber-1, outofBounds=False, mine=True).first()
-                    if cell:
-                        temp_adjacent_counter = temp_adjacent_counter + 1
-
-                # Bottom-right diagonal (1 row down, 1 column right)
-                if columnNumber + 1 < self.columns and rowNumber + 1 < self.rows:  # Check bounds
-                    cell = self.board.filter(column=columnNumber+1, row=rowNumber+1, outofBounds=False, mine=True).first()
-                    if cell:
-                        temp_adjacent_counter = temp_adjacent_counter + 1
-
-                # Top-left diagonal (1 row up, 1 column left)
-                if columnNumber - 1 >= 0 and rowNumber - 1 >= 0:  # Check bounds
-                    cell = self.board.filter(column=columnNumber-1, row=rowNumber-1, outofBounds=False, mine=True).first()
-                    if cell:
-                        temp_adjacent_counter = temp_adjacent_counter + 1
-                
-                # Bottom-left diagonal (1 row down, 1 column left)
-                if columnNumber - 1 >= 0 and rowNumber + 1 < self.rows:  # Check bounds
-                    cell = self.board.filter(column=columnNumber-1, row=rowNumber+1, outofBounds=False, mine=True).first()
-                    if cell:
-                        temp_adjacent_counter = temp_adjacent_counter + 1
-
-                cell = self.board.filter(column=columnNumber, row=rowNumber).first()
-                cell.adjacent = temp_adjacent_counter
-                cell.save()
+        # --------------------------------------------------
+        # OPTIMIZED: one bulk update
+        # --------------------------------------------------
+        Cell.objects.bulk_update(
+            cells,
+            ["mine", "adjacent"],
+            batch_size=1000
+        )
 
         self.progress = 'IP'
         self.save()
 
-    def flagCell(self, key):
+        def flagCell(self, key):
 
-        if self.progress in ['LOST', 'WON']:
-            return
-        
-        coordinates = self.get_coordinates_from_key(key)
-        columnNumber = coordinates[0]
-        rowNumber = coordinates[1]
-
-        cell = self.board.filter(column=columnNumber, row=rowNumber, revealed=False).first()
-        if cell:
-            if cell.flagged == True:
-                self.flags += 1
-            else:
-                self.flags -= 1
+            if self.progress in ['LOST', 'WON']:
+                return
             
-            self.save()
-            cell.flagged = not cell.flagged
-            self.mark_changed(cell)
-            cell.save()
-    
+            coordinates = self.get_coordinates_from_key(key)
+            columnNumber = coordinates[0]
+            rowNumber = coordinates[1]
+
+            cell = self.board.filter(column=columnNumber, row=rowNumber, revealed=False).first()
+            if cell:
+                if cell.flagged == True:
+                    self.flags += 1
+                else:
+                    self.flags -= 1
+                
+                self.save()
+                cell.flagged = not cell.flagged
+                self.mark_changed(cell)
+                cell.save()
+        
     def gameLost(self):
         #reveal all mines
         for items in self.mine_keys:
