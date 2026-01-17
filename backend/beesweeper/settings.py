@@ -16,19 +16,22 @@ DATABASES = {
 
 
 # SECURITY
-DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+DEBUG = True
+# DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME")
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "[::1]",
+ALLOWED_HOSTS=['*']
 
-    ".onrender.com",
-    ".vercel.app",
-    ".netlify.app",
-    "ShairahavanS.github.io",  
-]
+# ALLOWED_HOSTS = [
+#     "localhost",
+#     "127.0.0.1",
+#     "[::1]",
+
+#     ".onrender.com",
+#     ".vercel.app",
+#     ".netlify.app",
+#     "ShairahavanS.github.io",  
+# ]
 
 # Application definition
 INSTALLED_APPS = [
@@ -41,6 +44,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "beesweeper_api",
+    "minesweeper_api",
     "hexchess",
     "hexcheckers",
 ]

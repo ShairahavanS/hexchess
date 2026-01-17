@@ -102,6 +102,7 @@ class Game(models.Model):
 
         for col in range(self.columns):
             for row in range(self.rows):
+
                 cell = Cell(
                     column=col,
                     row=row,
@@ -286,26 +287,26 @@ class Game(models.Model):
         self.progress = 'IP'
         self.save()
 
-        def flagCell(self, key):
+    def flagCell(self, key):
 
-            if self.progress in ['LOST', 'WON']:
-                return
+        if self.progress in ['LOST', 'WIN']:
+            return
+        
+        coordinates = self.get_coordinates_from_key(key)
+        columnNumber = coordinates[0]
+        rowNumber = coordinates[1]
+
+        cell = self.board.filter(column=columnNumber, row=rowNumber, revealed=False).first()
+        if cell:
+            if cell.flagged == True:
+                self.flags += 1
+            else:
+                self.flags -= 1
             
-            coordinates = self.get_coordinates_from_key(key)
-            columnNumber = coordinates[0]
-            rowNumber = coordinates[1]
-
-            cell = self.board.filter(column=columnNumber, row=rowNumber, revealed=False).first()
-            if cell:
-                if cell.flagged == True:
-                    self.flags += 1
-                else:
-                    self.flags -= 1
-                
-                self.save()
-                cell.flagged = not cell.flagged
-                self.mark_changed(cell)
-                cell.save()
+            self.save()
+            cell.flagged = not cell.flagged
+            self.mark_changed(cell)
+            cell.save()
         
     def gameLost(self):
         #reveal all mines

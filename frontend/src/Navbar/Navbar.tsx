@@ -4,6 +4,9 @@ import logo from "../images/webdesign/HexChessLogo.svg";
 import checkerPiece from "../images/checkerPieces/Red Checker Piece.svg";
 import chessPiece from "../images/chessPieces/Chess_rdt45.svg";
 import bee from "../images/beesweeper/HexBee.svg";
+import mine from "../images/minesweeper/Mine.svg";
+import flag from "../images/minesweeper/Flag.svg";
+import trophy from "../images/minesweepersweeper/Trophy.svg";
 import settings from "../images/webdesign/Settings.svg";
 import howToPlay from "../images/webdesign/HowtoPlay.svg";
 import gifTest from "../images/webdesign/MJ-giphy.gif";
@@ -16,7 +19,7 @@ import Modal from "./Modal.tsx";
 
 interface HowToPlayStep {
   caption: string;
-  video: string; 
+  video: string;
 }
 
 const beesweeperSteps: HowToPlayStep[] = [
@@ -37,6 +40,17 @@ const beesweeperSteps: HowToPlayStep[] = [
   {
     video: step4,
     caption: "Free all the cells to harvest the honeycomb!",
+  },
+];
+
+const minesweeperSteps: HowToPlayStep[] = [
+  {
+    video: "/gifs/move-piece.mp4",
+    caption: "Move pieces according to standard chess rules.",
+  },
+  {
+    video: "/gifs/checkmate.mp4",
+    caption: "Checkmate your opponent's king to win.",
   },
 ];
 
@@ -68,6 +82,7 @@ const checkersSteps: HowToPlayStep[] = [
 
 const stepsByPage: { [key: string]: HowToPlayStep[] } = {
   "/Beesweeper": beesweeperSteps,
+  "/Minesweeper": minesweeperSteps,
   "/Chess": chessSteps,
   "/Checkers": checkersSteps,
 };
@@ -89,6 +104,12 @@ const howToPlayContent: { [key: string]: React.ReactNode } = {
         the right number of adjacent flags to free unflagged adjacent cells.
       </p>
       <p>Free all the cells and harvest the honeycomb!</p>
+    </div>
+  ),
+  "/Minesweeper": (
+    <div>
+      <p>Classic minesweeper...but with a twist</p>
+      <p>Play with each of the tessellations..</p>
     </div>
   ),
   "/Chess": (
@@ -142,6 +163,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode }) => {
 
   const pageImages: { [key: string]: string } = {
     "/Beesweeper": bee,
+    "/Minesweeper": flag,
     "/Chess": chessPiece,
     "/Checkers": checkerPiece,
   };
@@ -182,6 +204,15 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode }) => {
           >
             <Link to="/Beesweeper" style={{}}>
               Beesweeper
+            </Link>
+          </li>
+          <li
+            className={`navbar-item ${
+              location.pathname === "/Minesweeper" ? "active" : ""
+            }`}
+          >
+            <Link to="/Minesweeper" style={{}}>
+              Minesweeper
             </Link>
           </li>
           <li
@@ -232,7 +263,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleDarkMode }) => {
 
         {/* How to Play Modal */}
         <Modal
-          className="how-to-play-modal" 
+          className="how-to-play-modal"
           isOpen={isHowToPlayModalOpen}
           onClose={closeHowToPlayModal}
           title="How to Play"

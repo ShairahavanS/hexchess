@@ -20,6 +20,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('beesweeper_api/', include('beesweeper_api.urls')),
+    path('minesweeper_api/', include('minesweeper_api.urls')),
     # path('hexchess/', include('hexchess.urls')),
     # path('hexcheckers/', include('hexcheckers.urls')),
 ]

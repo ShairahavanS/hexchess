@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./Beesweeper.css";
-import Grid from "../Grid/Grid.tsx";
+import "./Minesweeper.css";
+import OctGrid from "../Grid/OctGrid.tsx";
 import MinesweeperInfoBoard from "../MinesweeperInfoBoard/MinesweeperInfoBoard.tsx";
 import axios from "axios";
 import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
 import { BACKEND_URL } from "../constants.ts";
+import { table } from "console";
 
 export const api = axios.create({
   baseURL: BACKEND_URL,
@@ -12,11 +13,11 @@ export const api = axios.create({
 
 // self.numCells = ((self.sideLength * 2 - 2) * (self.sideLength * 2 - 1) - (self.sideLength) * (self.sideLength - 1)) + 2 * self.sideLength - 1
 
-interface BeesweeperProps {
+interface MinesweeperProps {
   darkMode: boolean;
 }
 
-const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
+const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
   const [level, setLevel] = useState("Easy");
   const [sides, setSides] = useState(6);
   const [numCells, setNumCells] = useState(91);
@@ -36,17 +37,17 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   const getSides = (level: string) => {
     switch (level) {
       case "Easy":
-        return 6;
+        return 5;
       case "Medium":
-        return 10;
+        return 9;
       case "Hard":
-        return 14;
+        return 13;
       case "Extreme":
-        return 18;
+        return 17;
       case "Impossible":
-        return 24;
+        return 21;
       default:
-        return 6;
+        return 5;
     }
   };
 
@@ -76,14 +77,13 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   };
 
   const startGame = () => {
-    api.post("/beesweeper_api/start/", { level }).then((res) => {
+    api.post("/minesweeper_api/start/", { level }).then((res) => {
       const newSides = getSides(level);
       setSides(newSides); // set sides immediately
+      const tableLength = 2 * sides - 1;
       const totalCells =
-        (newSides * 2 - 2) * (newSides * 2 - 1) -
-        newSides * (newSides - 1) +
-        2 * newSides -
-        1;
+        tableLength * tableLength -
+        2 * (Math.floor(tableLength / 2) * Math.floor(tableLength / 2 + 1));
       setNumCells(totalCells);
 
       setGameID(res.data.game_ID); // ✅ set gameID from backend
@@ -113,7 +113,7 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
     if (gameState === "NS") {
       switch (level) {
         case "Easy":
-          setFlags(18);
+          setFlags(13);
           setTime(0);
           break;
         case "Medium":
@@ -125,15 +125,15 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
           setTime(0);
           break;
         case "Extreme":
-          setFlags(183);
+          setFlags(189);
           setTime(0);
           break;
         case "Impossible":
-          setFlags(331);
+          setFlags(292);
           setTime(0);
           break;
         default:
-          setFlags(18);
+          setFlags(13);
           setTime(0);
       }
 
@@ -169,7 +169,7 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   const handleReset = () => {
     if (!gameID) return;
 
-    api.post(`/beesweeper_api/${gameID}/reset/`).then((res) => {
+    api.post(`/minesweeper_api/${gameID}/reset/`).then((res) => {
       // stop any ongoing timer immediately
       setStartTime(res.data.progress === "IP" ? Date.now() : null);
       setTime(0);
@@ -190,14 +190,14 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   return (
     <div className={`board-complete ${darkMode ? "dark" : "light"}`}>
       <div
-        className="hex-grid-area"
+        className="oct-grid-area"
         style={{
           width: `${width}vmin`,
           height: `100%`,
         }}
       >
-        <div className="Beesweeper" onContextMenu={(e) => e.preventDefault()}>
-          <Grid
+        <div className="Minesweeper" onContextMenu={(e) => e.preventDefault()}>
+          <OctGrid
             sideLength={sides}
             level={level}
             game_ID={gameID}
@@ -224,4 +224,4 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   );
 };
 
-export default Beesweeper;
+export default Minesweeper;

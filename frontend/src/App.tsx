@@ -4,6 +4,7 @@ import Navbar from "./Navbar/Navbar.tsx";
 import Footer from "./Footer/Footer.tsx";
 import Home from "./pages/Home.tsx";
 import Beesweeper from "./pages/Beesweeper.tsx";
+import Minesweeper from "./pages/Minesweeper.tsx";
 import Chess from "./pages/Chess.tsx";
 import Checkers from "./pages/Checkers.tsx";
 
@@ -24,6 +25,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home darkMode={darkMode} />} />
             <Route path="/Beesweeper" element={<Beesweeper darkMode={darkMode} />} />
+            <Route path="/Minesweeper" element={<Minesweeper darkMode={darkMode} />} />
             <Route path="/Chess" element={<Chess darkMode={darkMode} />} />
             <Route path="/Checkers" element={<Checkers darkMode={darkMode} />} />
           </Routes>

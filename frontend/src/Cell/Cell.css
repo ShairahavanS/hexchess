@@ -27,14 +27,18 @@
   width: 80%; /* Adjust the image size relative to the hexagon */
   height: 80%; /* Ensure the image maintains its aspect ratio */
   object-fit: contain; /* Maintain image aspect ratio without stretching */
-  user-select: none;       /* Prevent text/image selection */
+  user-select: none; /* Prevent text/image selection */
   -webkit-user-drag: none; /* Prevent dragging images in WebKit browsers */
-  pointer-events: none;    /* Ignore pointer events on the image (so clicks go to the cell) */
+  pointer-events: none; /* Ignore pointer events on the image (so clicks go to the cell) */
 }
 
-/* .hexagon:hover {
-	background-color: purple;
-} */
+.hexagon.unbroken:hover {
+  background-color: rgb(213, 138, 0);
+}
+
+.hexagon.flagged:hover {
+  background-color: rgb(213, 138, 0);
+}
 
 .hexagon.unbroken {
   background-color: orange; /* or your default color */

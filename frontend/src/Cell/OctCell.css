@@ -1,66 +1,136 @@
 /* Hexagon Styling */
 
-.hexagon {
-    background-color: orange;
-    width: 90%; /* Adjust the size of the hexagon */
-    height: 90%; /* Adjust the height for the hexagon */
-    clip-path: polygon(
-      25% 0%,
-      75% 0%,
-      100% 50%,
-      75% 100%,
-      25% 100%,
-      0% 50%
-    ); /* Hexagonal shape */
-  
-    display: flex;
-    align-items: center; /* Vertically center the content */
-    justify-content: center; /* Horizontally center the content */
-    cursor: pointer; /* Cursor pointer on hover */
-  
-    position: relative; /* Ensure flexbox works correctly */
-  }
-  
-  /* Image inside the hexagon */
-  .hexagon img {
-    position: absolute;
-    width: 80%; /* Adjust the image size relative to the hexagon */
-    height: 80%; /* Ensure the image maintains its aspect ratio */
-    object-fit: contain; /* Maintain image aspect ratio without stretching */
-    user-select: none;       /* Prevent text/image selection */
-    -webkit-user-drag: none; /* Prevent dragging images in WebKit browsers */
-    pointer-events: none;    /* Ignore pointer events on the image (so clicks go to the cell) */
-  }
-  
-  /* .hexagon:hover {
-      background-color: purple;
-  } */
-  
-  .hexagon.unbroken {
-    background-color: orange; /* or your default color */
-  }
-  
-  .hexagon.flagged {
-    background-color: orange; /* or your default color */
-  }
-  
-  .hexagon.empty {
-    background-color: tan;
-    cursor: default;
-  }
-  
-  .hexagon.numbered {
-    background-color: tan;
-    cursor: default;
-  }
-  
-  .hexagon.bee {
-    background-color: red;
-    cursor: default;
-  }
-  
-  .hexagon.honey {
-    background-color: rgb(102, 255, 0);
-    cursor: default;
-  }
-  
+.octagon {
+  background-color: blue;
+  width: 90%; /* Adjust the size of the hexagon */
+  height: 90%; /* Adjust the height for the hexagon */
+  clip-path: polygon(
+    29.29% 0,
+    70.71% 0,
+    100% 29.29%,
+    100% 70.71%,
+    70.71% 100%,
+    29.29% 100%,
+    0 70.71%,
+    0 29.29%
+  ); /* Hexagonal shape */
+
+  display: flex;
+  align-items: center; /* Vertically center the content */
+  justify-content: center; /* Horizontally center the content */
+  cursor: pointer; /* Cursor pointer on hover */
+
+  position: relative; /* Ensure flexbox works correctly */
+}
+
+.oct-square {
+  background-color: orangered;
+  width: 90%; /* Adjust the size of the hexagon */
+  height: 90%; /* Adjust the height for the hexagon */
+  clip-path: polygon(
+    29.29% 29.29%,
+    70.71% 29.29%,
+    70.71% 70.71%,
+    29.29% 70.71%
+  ); /* Hexagonal shape */
+
+  display: flex;
+  align-items: center; /* Vertically center the content */
+  justify-content: center; /* Horizontally center the content */
+  cursor: pointer; /* Cursor pointer on hover */
+
+  position: relative; /* Ensure flexbox works correctly */
+}
+
+/* Image inside the hexagon */
+.octagon img {
+  position: absolute;
+  width: 75%; /* Adjust the image size relative to the hexagon */
+  height: 75%; /* Ensure the image maintains its aspect ratio */
+  object-fit: contain; /* Maintain image aspect ratio without stretching */
+  user-select: none; /* Prevent text/image selection */
+  -webkit-user-drag: none; /* Prevent dragging images in WebKit browsers */
+  pointer-events: none; /* Ignore pointer events on the image (so clicks go to the cell) */
+}
+
+.oct-square img {
+  position: absolute;
+  width: 35%; /* Adjust the image size relative to the hexagon */
+  height: 35%; /* Ensure the image maintains its aspect ratio */
+  object-fit: contain; /* Maintain image aspect ratio without stretching */
+  user-select: none; /* Prevent text/image selection */
+  -webkit-user-drag: none; /* Prevent dragging images in WebKit browsers */
+  pointer-events: none; /* Ignore pointer events on the image (so clicks go to the cell) */
+}
+
+.octagon.unbroken:hover {
+  background-color: rgb(29, 7, 199);
+}
+
+.octagon.flagged:hover {
+  background-color: rgb(29, 7, 199);
+}
+
+.octagon.unbroken {
+  background-color: blue; /* or your default color */
+}
+
+.octagon.flagged {
+  background-color: blue; /* or your default color */
+}
+
+.octagon.empty {
+  background-color: tan;
+  cursor: default;
+}
+
+.octagon.numbered {
+  background-color: tan;
+  cursor: default;
+}
+
+.octagon.mine {
+  background-color: red;
+  cursor: default;
+}
+
+.octagon.trophy {
+  background-color: rgb(102, 255, 0);
+  cursor: default;
+}
+
+.oct-square.unbroken:hover {
+  background-color: rgb(176, 67, 4);
+}
+
+.oct-square.flagged:hover {
+  background-color: rgb(176, 67, 4);
+}
+
+.oct-square.unbroken {
+  background-color: orangered; /* or your default color */
+}
+
+.oct-square.flagged {
+  background-color: blue; /* or your default color */
+}
+
+.oct-square.empty {
+  background-color: tan;
+  cursor: default;
+}
+
+.oct-square.numbered {
+  background-color: tan;
+  cursor: default;
+}
+
+.oct-square.mine {
+  background-color: red;
+  cursor: default;
+}
+
+.oct-square.trophy {
+  background-color: rgb(102, 255, 0);
+  cursor: default;
+}

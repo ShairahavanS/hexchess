@@ -1,18 +1,19 @@
-.Beesweeper {
+.Minesweeper {
   height: 92%;
-  width: 92%;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
+  aspect-ratio: 1 / 1;
 }
 
-.grid-area {
+.oct-grid-area {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center; /* align top */
   margin-left: 5vw; /* optional */
+  aspect-ratio: 1 / 1;
 }
 
 .board-complete {
@@ -38,9 +39,9 @@
   margin-left: 0vmin;
 }
 
-/* .infoBoard {
+.infoBoard {
   background-color: lightgray;
   position: fixed;
-  right: 20vmin;            
-  width: 50vmin;          
-} */
+  right: 20vmin;
+  width: 50vmin;
+}
