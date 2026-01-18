@@ -342,7 +342,7 @@ class Game(models.Model):
             self.save()
 
 
-    def singleClickCell(self, key):
+    def singleClickCell(self, key, recursive=False):
         coordinates = self.get_coordinates_from_key(key)
         columnNumber = coordinates[0]
         rowNumber = coordinates[1]
@@ -350,7 +350,14 @@ class Game(models.Model):
         if self.progress == 'NS':
             self.generate_mines(key)
 
-        cell = self.board.filter(column=columnNumber, row=rowNumber, revealed=False, flagged=False).first()
+        cell = self.board.filter(column=columnNumber, row=rowNumber, revealed=False).first()
+
+        if not cell or cell.revealed:
+            return
+
+        # Only block flagged cells on USER clicks
+        if cell.flagged and not recursive:
+            return
 
         if not cell:
             dummy = 0
@@ -368,42 +375,42 @@ class Game(models.Model):
                     cell = self.board.filter(column=columnNumber, row=rowNumber-2, outofBounds=False).first()
                     if cell:
                         tempKey = self.get_key_from_coordinates(columnNumber, rowNumber-2)
-                        self.singleClickCell(tempKey)
+                        self.singleClickCell(tempKey, recursive=True)
 
                 # Down 2 rows
                 if rowNumber + 2 < self.rows:  # Ensure we don't go out of bounds
                     cell = self.board.filter(column=columnNumber, row=rowNumber+2, outofBounds=False).first()
                     if cell:
                         tempKey = self.get_key_from_coordinates(columnNumber, rowNumber+2)
-                        self.singleClickCell(tempKey)
+                        self.singleClickCell(tempKey, recursive=True)
 
                 # Top-right diagonal (1 row up, 1 column right)
                 if columnNumber + 1 < self.columns and rowNumber - 1 >= 0:  # Check bounds
                     cell = self.board.filter(column=columnNumber+1, row=rowNumber-1, outofBounds=False).first()
                     if cell:
                         tempKey = self.get_key_from_coordinates(columnNumber+1, rowNumber-1)
-                        self.singleClickCell(tempKey)
+                        self.singleClickCell(tempKey, recursive=True)
 
                 # Bottom-right diagonal (1 row down, 1 column right)
                 if columnNumber + 1 < self.columns and rowNumber + 1 < self.rows:  # Check bounds
                     cell = self.board.filter(column=columnNumber+1, row=rowNumber+1, outofBounds=False).first()
                     if cell:
                         tempKey = self.get_key_from_coordinates(columnNumber+1, rowNumber+1)
-                        self.singleClickCell(tempKey)
+                        self.singleClickCell(tempKey, recursive=True)
 
                 # Top-left diagonal (1 row up, 1 column left)
                 if columnNumber - 1 >= 0 and rowNumber - 1 >= 0:  # Check bounds
                     cell = self.board.filter(column=columnNumber-1, row=rowNumber-1, outofBounds=False).first()
                     if cell:
                         tempKey = self.get_key_from_coordinates(columnNumber-1, rowNumber-1)
-                        self.singleClickCell(tempKey)
+                        self.singleClickCell(tempKey, recursive=True)
 
                 # Bottom-left diagonal (1 row down, 1 column left)
                 if columnNumber - 1 >= 0 and rowNumber + 1 < self.rows:  # Check bounds
                     cell = self.board.filter(column=columnNumber-1, row=rowNumber+1, outofBounds=False).first()
                     if cell:
                         tempKey = self.get_key_from_coordinates(columnNumber-1, rowNumber+1)
-                        self.singleClickCell(tempKey)
+                        self.singleClickCell(tempKey, recursive=True)
 
             self.checkWon()
 
@@ -500,43 +507,37 @@ class Game(models.Model):
                     if rowNumber - 2 >= 0:  # Ensure we don't go out of bounds
                         cell = self.board.filter(column=columnNumber, row=rowNumber-2, outofBounds=False, revealed=False).first()
                         if cell:
-                            cell.revealed = True
-                            cell.save()
+                            self.singleClickCell(cell.key, recursive=True)
 
                     # Down 2 rows
                     if rowNumber + 2 < self.rows:  # Ensure we don't go out of bounds
                         cell = self.board.filter(column=columnNumber, row=rowNumber+2, outofBounds=False, revealed=False).first()
                         if cell:
-                            cell.revealed = True
-                            cell.save()
+                            self.singleClickCell(cell.key, recursive=True)
 
                     # Top-right diagonal (1 row up, 1 column right)
                     if columnNumber + 1 < self.columns and rowNumber - 1 >= 0:  # Check bounds
                         cell = self.board.filter(column=columnNumber+1, row=rowNumber-1, outofBounds=False, revealed=False).first()
                         if cell:
-                            cell.revealed = True
-                            cell.save()
+                            self.singleClickCell(cell.key, recursive=True)
 
                     # Bottom-right diagonal (1 row down, 1 column right)
                     if columnNumber + 1 < self.columns and rowNumber + 1 < self.rows:  # Check bounds
                         cell = self.board.filter(column=columnNumber+1, row=rowNumber+1, outofBounds=False, revealed=False).first()
                         if cell:
-                            cell.revealed = True
-                            cell.save()
+                            self.singleClickCell(cell.key, recursive=True)
 
                     # Top-left diagonal (1 row up, 1 column left)
                     if columnNumber - 1 >= 0 and rowNumber - 1 >= 0:  # Check bounds
                         cell = self.board.filter(column=columnNumber-1, row=rowNumber-1, outofBounds=False, revealed=False).first()
                         if cell:
-                            cell.revealed = True
-                            cell.save()
+                            self.singleClickCell(cell.key, recursive=True)
 
                     # Bottom-left diagonal (1 row down, 1 column left)
                     if columnNumber - 1 >= 0 and rowNumber + 1 < self.rows:  # Check bounds
                         cell = self.board.filter(column=columnNumber-1, row=rowNumber+1, outofBounds=False, revealed=False).first()
                         if cell:
-                            cell.revealed = True
-                            cell.save()
+                            self.singleClickCell(cell.key, recursive=True)
 
                     self.gameLost()
 
@@ -545,42 +546,42 @@ class Game(models.Model):
                         cell = self.board.filter(column=columnNumber, row=rowNumber-2, outofBounds=False, flagged=False, revealed=False).first()
                         if cell:
                             tempkey = cell.key
-                            self.singleClickCell(tempkey)
+                            self.singleClickCell(tempkey, recursive=True)
 
                     # Down 2 rows
                     if rowNumber + 2 < self.rows:  # Ensure we don't go out of bounds
                         cell = self.board.filter(column=columnNumber, row=rowNumber+2, outofBounds=False, flagged=False, revealed=False).first()
                         if cell:
                             tempkey = cell.key
-                            self.singleClickCell(tempkey)
+                            self.singleClickCell(tempkey, recursive=True)
 
                     # Top-right diagonal (1 row up, 1 column right)
                     if columnNumber + 1 < self.columns and rowNumber - 1 >= 0:  # Check bounds
                         cell = self.board.filter(column=columnNumber+1, row=rowNumber-1, outofBounds=False, flagged=False, revealed=False).first()
                         if cell:
                             tempkey = cell.key
-                            self.singleClickCell(tempkey)
+                            self.singleClickCell(tempkey, recursive=True)
 
                     # Bottom-right diagonal (1 row down, 1 column right)
                     if columnNumber + 1 < self.columns and rowNumber + 1 < self.rows:  # Check bounds
                         cell = self.board.filter(column=columnNumber+1, row=rowNumber+1, outofBounds=False, flagged=False, revealed=False).first()
                         if cell:
                             tempkey = cell.key
-                            self.singleClickCell(tempkey)
+                            self.singleClickCell(tempkey, recursive=True)
 
                     # Top-left diagonal (1 row up, 1 column left)
                     if columnNumber - 1 >= 0 and rowNumber - 1 >= 0:  # Check bounds
                         cell = self.board.filter(column=columnNumber-1, row=rowNumber-1, outofBounds=False, flagged=False, revealed=False).first()
                         if cell:
                             tempkey = cell.key
-                            self.singleClickCell(tempkey)
+                            self.singleClickCell(tempkey, recursive=True)
 
                     # Bottom-left diagonal (1 row down, 1 column left)
                     if columnNumber - 1 >= 0 and rowNumber + 1 < self.rows:  # Check bounds
                         cell = self.board.filter(column=columnNumber-1, row=rowNumber+1, outofBounds=False, flagged=False, revealed=False).first()
                         if cell:
                             tempkey = cell.key
-                            self.singleClickCell(tempkey)
+                            self.singleClickCell(tempkey, recursive=True)
                     
             self.checkWon()
             self.save()

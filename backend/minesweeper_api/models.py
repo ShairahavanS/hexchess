@@ -396,7 +396,7 @@ class Game(models.Model):
             self.save()
 
 
-    def singleClickCell(self, key):
+    def singleClickCell(self, key, recursive=False):
 
         if key is None:
             return
@@ -412,7 +412,7 @@ class Game(models.Model):
 
 
         cell = self.board.filter(column=columnNumber, row=rowNumber).first()
-        if not cell or cell.revealed or cell.flagged:
+        if not cell or cell.revealed or (cell.flagged and not recursive):
             return
 
         if not cell:
@@ -435,7 +435,7 @@ class Game(models.Model):
                     neighbour = self.board.filter(column=columnNumber+dx, row=rowNumber+dy, outofBounds=False).first()
                     if neighbour:
                         tempKey = self.get_key_from_coordinates(columnNumber+dx, rowNumber+dy)
-                        self.singleClickCell(tempKey)
+                        self.singleClickCell(tempKey, recursive=True)
 
         self.checkWon()
         self.save()
@@ -471,8 +471,7 @@ class Game(models.Model):
                     for dx, dy in clickedCell.directions():
                         neighbour = self.board.filter(column=columnNumber+dx, row=rowNumber+dy, outofBounds=False, revealed=False).first()
                         if neighbour:
-                            neighbour.revealed = True
-                            neighbour.save()
+                            self.singleClickCell(neighbour.key, recursive=True)
 
                     self.gameLost()
 
@@ -482,7 +481,7 @@ class Game(models.Model):
                         neighbour = self.board.filter(column=columnNumber+dx, row=rowNumber+dy, outofBounds=False, flagged=True, revealed=False).first()
                         if neighbour:
                             tempkey = neighbour.key
-                            self.singleClickCell(tempkey)
+                            self.singleClickCell(tempkey, recursive=True)
                     
             self.checkWon()
             self.save()

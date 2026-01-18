@@ -14,20 +14,22 @@ class CellSerializer(serializers.ModelSerializer):
         if obj.honey:
             return "honey"
         
+        # Revealed cells
+
+        if obj.revealed and obj.mine:
+            return "mine"
+        
+        if obj.revealed:
+            return str(obj.adjacent)
+        
         # Flagged always wins
         if obj.flagged:
-            return "flag"
+            return "flag"        
 
         # Unrevealed cells should reveal NOTHING
         if not obj.revealed and not obj.honey:
             return "hidden"
-
-        # Revealed cells
-
-        if obj.mine:
-            return "mine"
         
-
         # Numbered cell (0–8)
         return str(obj.adjacent)
 

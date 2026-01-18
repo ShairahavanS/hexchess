@@ -112,7 +112,7 @@
 }
 
 .oct-square.flagged {
-  background-color: blue; /* or your default color */
+  background-color: orangered; /* or your default color */
 }
 
 .oct-square.empty {

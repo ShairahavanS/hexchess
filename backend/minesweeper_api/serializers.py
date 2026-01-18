@@ -14,19 +14,19 @@ class CellSerializer(serializers.ModelSerializer):
         if obj.trophy:
             return "trophy"
         
+        if obj.revealed and obj.mine:
+            return "mine"
+        
+        if obj.revealed:
+            return str(obj.adjacent)
+        
         # Flagged always wins
         if obj.flagged:
             return "flag"
 
         # Unrevealed cells should reveal NOTHING
         if not obj.revealed and not obj.trophy:
-            return "hidden"
-
-        # Revealed cells
-
-        if obj.mine:
-            return "mine"
-        
+            return "hidden"        
 
         # Numbered cell (0–8)
         return str(obj.adjacent)
