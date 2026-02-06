@@ -21,7 +21,7 @@ h3 {
   color: #333;
 }
 
-.reset-button {
+.oct-reset-button {
   padding: 10px 15px;
   background-color: #ff4444;
   color: white;
@@ -32,11 +32,11 @@ h3 {
   transition: background-color 0.3s ease;
 }
 
-.reset-button:hover {
+.oct-reset-button:hover {
   background-color: #cc3333;
 }
 
-.level-selector {
+.oct-level-selector {
   padding: 5px;
   font-size: 1rem;
   border: 1px solid #ccc;

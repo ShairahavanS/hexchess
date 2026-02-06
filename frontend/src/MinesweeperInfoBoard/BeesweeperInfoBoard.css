@@ -1,0 +1,127 @@
+.hex-info-board {
+  width: min(36vmin, 420px);
+  aspect-ratio: 1 / 1.15;
+
+  background: linear-gradient(145deg, #f9f9f9, #d6d6d6);
+  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35),
+    inset 0 2px 6px rgba(255, 255, 255, 0.65);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.timer.running h3 {
+  animation: pulse 1.1s ease-in-out infinite;
+}
+
+@media (max-width: 900px) {
+  .hex-info-board {
+    width: 60vmin;
+    margin-top: 2rem;
+  }
+}
+
+@media (min-width: 1600px) {
+  .hex-info-board {
+    width: 420px;
+  }
+}
+
+.hex-info-board:hover {
+  transform: scale(1.02);
+  box-shadow: 0 20px 48px rgba(111, 114, 4, 0.45),
+    inset 0 2px 6px rgba(255, 255, 255, 0.7);
+}
+
+.hex-info-content {
+  height: 100%;
+  width: 100%;
+
+  padding: 22% 14%;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.hex-info-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.hex-info-item h3 {
+  font-size: clamp(1.8rem, 3.5vmin, 2.4rem);
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+}
+
+.icon {
+  width: 34px;
+  height: 34px;
+}
+
+.reset-button {
+  background: #ff5555;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 26px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.reset-button:hover {
+  background: #e24444;
+  transform: translateY(-1px);
+}
+
+.hex-level-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.hex-level-row label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.hex-level-row select {
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+}
+
+.hex-level-row select:focus {
+  outline: none;
+  border-color: #888;
+}

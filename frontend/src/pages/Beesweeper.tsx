@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, JSX } from "react";
 import "./Beesweeper.css";
 import Grid from "../Grid/Grid.tsx";
-import MinesweeperInfoBoard from "../MinesweeperInfoBoard/MinesweeperInfoBoard.tsx";
+import BeesweeperInfoBoard from "../MinesweeperInfoBoard/BeesweeperInfoBoard.tsx";
 import axios from "axios";
 import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
 import { BACKEND_URL } from "../constants.ts";
@@ -9,6 +9,16 @@ import { BACKEND_URL } from "../constants.ts";
 export const api = axios.create({
   baseURL: BACKEND_URL,
 });
+
+type BeeParticle = {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  rot: number;
+  life: number;
+};
 
 // self.numCells = ((self.sideLength * 2 - 2) * (self.sideLength * 2 - 1) - (self.sideLength) * (self.sideLength - 1)) + 2 * self.sideLength - 1
 
@@ -25,8 +35,13 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   const [board, setBoard] = useState<MineCellInfo[]>([]);
   const [gameID, setGameID] = useState<string>("");
   const [gameState, setGameState] = useState("");
+  const [lostCellKey, setLostCellKey] = useState<number | null>(null);
 
   const [startTime, setStartTime] = useState<number | null>(null);
+
+  const beesRef = useRef<BeeParticle[]>([]);
+  const [bees, setBees] = useState<BeeParticle[]>([]);
+  const rafRef = useRef<number | null>(null);
 
   // Replace entire board (start/reset)
   const replaceBoard = (newBoard: MineCellInfo[]) => {
@@ -88,7 +103,7 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
 
       setGameID(res.data.game_ID); // ✅ set gameID from backend
       setGameState(res.data.progress);
-      setFlags(res.data.flags ?? flags);
+      setFlags(flags);
 
       // Lazy revelation: all hidden
       const hiddenBoard: MineCellInfo[] = Array.from(
@@ -109,40 +124,36 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
     startGame(); // start new game whenever level changes
   }, [level]);
 
+
+  
+
+  const handleGameState = (state: string, key?: number) => {
+    setGameState(state);
+    if (state === "LOST" && key !== undefined) {
+      setLostCellKey(key);
+    }
+  };
+
   useEffect(() => {
     if (gameState === "NS") {
-      switch (level) {
-        case "Easy":
-          setFlags(18);
-          setTime(0);
-          break;
-        case "Medium":
-          setFlags(54);
-          setTime(0);
-          break;
-        case "Hard":
-          setFlags(109);
-          setTime(0);
-          break;
-        case "Extreme":
-          setFlags(183);
-          setTime(0);
-          break;
-        case "Impossible":
-          setFlags(331);
-          setTime(0);
-          break;
-        default:
-          setFlags(18);
-          setTime(0);
-      }
-
       setNumCells(
         (sides * 2 - 2) * (sides * 2 - 1) - sides * (sides - 1) + 2 * sides - 1
       );
       setTime(0);
     }
   }, [gameState, level]);
+
+  useEffect(() => {
+    if (gameState === "LOST") {
+      document.body.classList.add("shake");
+
+      const timeout = setTimeout(() => {
+        document.body.classList.remove("shake");
+      }, 350);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [gameState]);
 
   // TIMER EFFECT
   useEffect(() => {
@@ -176,24 +187,88 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
 
       // lazy reset board
       setBoard((prev) => prev.map((c) => ({ key: c.key, kind: "hidden" })));
-      setFlags(res.data.flags ?? flags);
+      setFlags(res.data.flags);
 
       // set game state last to trigger timer effect
       setGameState(res.data.progress);
     });
   };
 
+
+
+
+
+
+
+  useEffect(() => {
+    if (gameState !== "LOST" || lostCellKey === null) return;
+
+    const cellEl = document.getElementById(`cell-${lostCellKey}`);
+    const container = document.querySelector(".hex-grid-area");
+
+    if (!cellEl || !container) return;
+
+    const cellRect = cellEl.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    const x = cellRect.left - containerRect.left + cellRect.width / 2;
+    const y = cellRect.top - containerRect.top + cellRect.height / 2;
+
+    const COUNT = 40;
+
+    beesRef.current = Array.from({ length: COUNT }, (_, i) => ({
+      id: i,
+      x,
+      y,
+      vx: (Math.random() - 0.5) * 7,
+      vy: (Math.random() - 0.5) * 7,
+      rot: Math.random() * 360,
+      life: 90 + Math.random() * 30,
+    }));
+
+    animateBees();
+  }, [gameState, lostCellKey]);
+
+  const animateBees = () => {
+    beesRef.current.forEach((bee) => {
+      bee.x += bee.vx;
+      bee.y += bee.vy;
+      bee.vy += 0.15;
+      bee.rot += 12;
+      bee.life -= 1;
+    });
+
+    beesRef.current = beesRef.current.filter((b) => b.life > 0);
+
+    setBees([...beesRef.current]);
+
+    if (beesRef.current.length > 0) {
+      rafRef.current = requestAnimationFrame(animateBees);
+    } else {
+      setBees([]);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    }
+  };
+
+  const MAX_SIDES = 24;
+  const FIXED_RATIO =
+    ((2 * MAX_SIDES - 1) / (3 * MAX_SIDES - 1)) * Math.sqrt(3);
+
+  const FIXED_WIDTH = 90 / FIXED_RATIO;
+
   let ratio = ((2 * sides - 1) / (3 * sides - 1)) * Math.sqrt(3);
   let height = 90;
   let width = height / ratio;
 
   return (
-    <div className={`board-complete ${darkMode ? "dark" : "light"}`}>
+    <div
+      className={`board-complete ${darkMode ? "dark" : "light"} ${gameState}`}
+    >
       <div
         className="hex-grid-area"
         style={{
-          width: `${width}vmin`,
-          height: `100%`,
+          width: `${FIXED_WIDTH}vmin`,
+          height: "100%",
         }}
       >
         <div className="Beesweeper" onContextMenu={(e) => e.preventDefault()}>
@@ -204,17 +279,31 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
             board={board}
             onUpdateBoard={mergeBoardChanges}
             onUpdateFlags={setFlags}
-            onUpdateGameState={setGameState}
+            onUpdateGameState={handleGameState}
           />
+          <div className="bee-particles">
+            {bees.map((b) => (
+              <div
+                key={b.id}
+                className="bee-particle"
+                style={{
+                  left: `${b.x}px`,
+                  top: `${b.y}px`,
+                  transform: `rotate(${b.rot}deg)`,
+                }}
+              />
+            ))}
+          </div>
         </div>
       </div>
-      <div className="infoBoard">
-        <MinesweeperInfoBoard
+      <div className={`beeInfoBoard ${darkMode ? "dark" : "light"}`}>
+        <BeesweeperInfoBoard
           level={level}
           setLevel={setLevel}
           flagsLeft={flags}
           onReset={handleReset}
           time={time}
+          gameState={gameState}
         />
       </div>
       <div>

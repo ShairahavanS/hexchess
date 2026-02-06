@@ -27,23 +27,25 @@ export enum CellState {
   Trophy = "trophy",
 }
 
-interface CellProps {
+interface OctCellProps {
   gameID: string;
   cellShape: string;
   cellID: number;
   cellData?: MineCellInfo;
+  lostCellKey?: number | null;
   onUpdateBoard?: (changedCells: MineCellInfo[]) => void;
   onUpdateFlags?: (newFlags: number) => void;
-  onUpdateGameState?: (newState: string) => void;
+  onUpdateGameState?: (state: string, triggerKey?: number) => void;
   withBorder?: boolean;
   borderStyle?: React.CSSProperties;
 }
 
-const OctCell: React.FC<CellProps> = ({
+const OctCell: React.FC<OctCellProps> = ({
   gameID,
   cellShape,
   cellID,
   cellData,
+  lostCellKey,
   onUpdateBoard,
   onUpdateFlags,
   onUpdateGameState,
@@ -74,6 +76,8 @@ const OctCell: React.FC<CellProps> = ({
     }
   })();
 
+  const isLosingMine = cellData?.kind === "mine" && lostCellKey === cellID;
+
   /** Handle left click (reveal) */
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -85,7 +89,10 @@ const OctCell: React.FC<CellProps> = ({
         onUpdateBoard?.(response.data.board); // 🔴 JUST SEND DELTAS
 
         if (response.data.progress) {
-          onUpdateGameState?.(response.data.progress);
+          onUpdateGameState?.(response.data.progress, cellID);
+        }
+        if (response.data.flags !== undefined) {
+          onUpdateFlags?.(response.data.flags);
         }
       });
   };
@@ -101,6 +108,9 @@ const OctCell: React.FC<CellProps> = ({
       .then((response) => {
         onUpdateBoard?.(response.data.board);
 
+        if (response.data.progress) {
+          onUpdateGameState?.(response.data.progress, cellID);
+        }
         if (response.data.flags !== undefined) {
           onUpdateFlags?.(response.data.flags);
         }
@@ -131,7 +141,10 @@ const OctCell: React.FC<CellProps> = ({
         onUpdateBoard?.(response.data.board);
 
         if (response.data.progress) {
-          onUpdateGameState?.(response.data.progress);
+          onUpdateGameState?.(response.data.progress, cellID);
+        }
+        if (response.data.flags !== undefined) {
+          onUpdateFlags?.(response.data.flags);
         }
       });
   };
@@ -173,9 +186,13 @@ const OctCell: React.FC<CellProps> = ({
 
   const cellElement = (
     <div
-      className={`${
-        cellShape === "square" ? "oct-square" : "octagon"
-      } ${displayState.toLowerCase()}`}
+      id={`cell-${cellID}`}
+      className={`
+      oct-cell
+      ${cellShape === "square" ? "oct-square" : "octagon"}
+      ${displayState.toLowerCase()}
+      ${isLosingMine ? "explode" : ""}
+    `}
       style={withBorder ? borderStyle : {}}
       onClick={handleClick}
       onContextMenu={handleRightClick}

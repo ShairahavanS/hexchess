@@ -1,4 +1,5 @@
 import React from "react";
+import ChessBoard from "../ChessBoard/ChessBoard.tsx";
 
 interface ChessProps {
   darkMode: boolean;
@@ -17,7 +18,7 @@ const Chess: React.FC<ChessProps> = ({ darkMode }) => {
         height: `${height}vmin`,
       }}
     >
-      {/* <div
+      <div
         className="grid-area-checkers"
         style={{
           width: `${width}vmin`,
@@ -25,9 +26,9 @@ const Chess: React.FC<ChessProps> = ({ darkMode }) => {
         }}
       >
         <div className="checkerboard">
-          <Checkerboard />
+          <ChessBoard />
         </div>
-      </div> */}
+      </div>
       <div>
         <h1
           style={{

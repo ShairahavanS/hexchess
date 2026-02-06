@@ -105,6 +105,7 @@ function Grid({
             cellID={count}
             cellData={cellData}
             onUpdateBoard={onUpdateBoard}
+            onUpdateFlags={onUpdateFlags}
             onUpdateGameState={onUpdateGameState}
           />
         </div>

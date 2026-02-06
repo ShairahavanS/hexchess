@@ -20,7 +20,7 @@ const Checkers: React.FC<CheckerProps> = ({ darkMode }) => {
         height: `${height}vmin`,
       }}
     >
-      {/* <div
+      <div
         className="grid-area-checkers"
         style={{
           width: `${width}vmin`,
@@ -30,7 +30,7 @@ const Checkers: React.FC<CheckerProps> = ({ darkMode }) => {
         <div className="checkerboard">
           <Checkerboard />
         </div>
-      </div> */}
+      </div>
       <div>
         <h1
           style={{

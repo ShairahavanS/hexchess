@@ -17,6 +17,16 @@ interface MinesweeperProps {
   darkMode: boolean;
 }
 
+type BeeParticle = {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  rot: number;
+  life: number;
+};
+
 const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
   const [level, setLevel] = useState("Easy");
   const [sides, setSides] = useState(6);
@@ -26,6 +36,7 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
   const [board, setBoard] = useState<MineCellInfo[]>([]);
   const [gameID, setGameID] = useState<string>("");
   const [gameState, setGameState] = useState("");
+  const [lostCellKey, setLostCellKey] = useState<number | null>(null);
 
   const [startTime, setStartTime] = useState<number | null>(null);
 
@@ -183,16 +194,47 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
     });
   };
 
+  const handleGameState = (state: string, key?: number) => {
+    setGameState(state);
+    if (state === "LOST" && key !== undefined) {
+      setLostCellKey(key);
+      console.log("BOOM");
+      console.log(key);
+    }
+  };
+
+  useEffect(() => {
+    if (gameState === "LOST") {
+      document.body.classList.add("shake");
+
+      const timeout = setTimeout(() => {
+        document.body.classList.remove("shake");
+      }, 350);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [gameState]);
+
+  const MAX_SIDES = 24;
+  const FIXED_RATIO =
+    ((2 * MAX_SIDES - 1) / (3 * MAX_SIDES - 1)) * Math.sqrt(3);
+
+  const FIXED_WIDTH = 90 / FIXED_RATIO;
+
   let ratio = ((2 * sides - 1) / (3 * sides - 1)) * Math.sqrt(3);
   let height = 90;
   let width = height / ratio;
 
   return (
-    <div className={`board-complete ${darkMode ? "dark" : "light"}`}>
+    <div
+      className={`oct-board-complete ${
+        darkMode ? "dark" : "light"
+      } ${gameState}`}
+    >
       <div
         className="oct-grid-area"
         style={{
-          width: `${width}vmin`,
+          width: `${FIXED_WIDTH}vmin`,
           height: `100%`,
         }}
       >
@@ -202,9 +244,10 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
             level={level}
             game_ID={gameID}
             board={board}
+            lostCellKey={lostCellKey}
             onUpdateBoard={mergeBoardChanges}
             onUpdateFlags={setFlags}
-            onUpdateGameState={setGameState}
+            onUpdateGameState={handleGameState}
           />
         </div>
       </div>

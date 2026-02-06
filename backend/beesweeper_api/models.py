@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 import json
 import random
 import uuid
@@ -287,26 +287,67 @@ class Game(models.Model):
         self.progress = 'IP'
         self.save()
 
-    def flagCell(self, key):
+    # def flagCell(self, key):
+    #     if self.progress in ['LOST', 'WIN']:
+    #         return
 
+    #     coordinates = self.get_coordinates_from_key(key)
+    #     if not coordinates:
+    #         return
+
+    #     columnNumber, rowNumber = coordinates
+
+    #     cell = self.board.filter(column=columnNumber, row=rowNumber).first()
+    #     if not cell:
+    #         return
+
+    #     # 🚫 DO NOT allow flagging revealed cells
+    #     if cell.revealed:
+    #         return
+
+    #     if cell.flagged:
+    #         self.flags += 1
+    #     else:
+    #         self.flags -= 1
+
+    #     cell.flagged = not cell.flagged
+    #     self.mark_changed(cell)
+    #     self.save()
+    #     cell.save()
+
+    def flagCell(self, key):
         if self.progress in ['LOST', 'WIN']:
             return
-        
-        coordinates = self.get_coordinates_from_key(key)
-        columnNumber = coordinates[0]
-        rowNumber = coordinates[1]
 
-        cell = self.board.filter(column=columnNumber, row=rowNumber, revealed=False).first()
-        if cell:
-            if cell.flagged == True:
+        coordinates = self.get_coordinates_from_key(key)
+        if not coordinates:
+            return
+
+        col, row = coordinates
+
+        with transaction.atomic():
+            cell = (
+                self.board
+                .select_for_update()
+                .filter(column=col, row=row)
+                .first()
+            )
+
+            if not cell or cell.revealed:
+                return
+
+            if cell.flagged:
                 self.flags += 1
             else:
+                if self.flags <= 0:
+                    return
                 self.flags -= 1
-            
-            self.save()
+
             cell.flagged = not cell.flagged
-            self.mark_changed(cell)
             cell.save()
+            self.save()
+            self.mark_changed(cell)
+
         
     def gameLost(self):
         #reveal all mines
@@ -315,10 +356,9 @@ class Game(models.Model):
             columnNumber = coordinates[0]
             rowNumber = coordinates[1]
             cell = self.board.filter(column=columnNumber, row=rowNumber).first()
-            cell.flagged = False
-            cell.revealed = True
-            self.mark_changed(cell)
-            cell.save()
+            if cell:
+                self.reveal_cell(cell)
+                self.mark_changed(cell)
 
         self.progress = 'LOST'
         self.save()
@@ -341,6 +381,24 @@ class Game(models.Model):
 
             self.save()
 
+    def reveal_cell(self, cell):
+        if cell.revealed:
+            return False  # no flag change
+
+        flag_recovered = False
+
+        if cell.flagged:
+            cell.flagged = False
+            self.flags += 1
+            flag_recovered = True
+
+        cell.revealed = True
+        self.mark_changed(cell)
+        cell.save()
+
+        return flag_recovered
+
+
 
     def singleClickCell(self, key, recursive=False):
         coordinates = self.get_coordinates_from_key(key)
@@ -350,14 +408,15 @@ class Game(models.Model):
         if self.progress == 'NS':
             self.generate_mines(key)
 
-        cell = self.board.filter(column=columnNumber, row=rowNumber, revealed=False).first()
+        cell = self.board.filter(column=columnNumber, row=rowNumber).first()
 
         if not cell or cell.revealed:
             return
 
         # Only block flagged cells on USER clicks
         if cell.flagged and not recursive:
-            return
+            return  # user click blocked
+
 
         if not cell:
             dummy = 0
@@ -365,9 +424,10 @@ class Game(models.Model):
             self.gameLost()
         elif cell.revealed == False:
             
-            cell.revealed = True
-            self.mark_changed(cell)
-            cell.save()
+            flag_recovered = self.reveal_cell(cell)
+            if flag_recovered:
+                self.mark_changed(cell)
+
             self.numberRevealed -= 1
 
             if cell.adjacent == 0:
@@ -414,7 +474,6 @@ class Game(models.Model):
 
             self.checkWon()
 
-        self.checkWon()
         self.save()
 
     def doubleClickCell(self, key):

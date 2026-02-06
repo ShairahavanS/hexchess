@@ -33,7 +33,8 @@ interface CellProps {
   cellData?: MineCellInfo;
   onUpdateBoard?: (changedCells: MineCellInfo[]) => void;
   onUpdateFlags?: (newFlags: number) => void;
-  onUpdateGameState?: (newState: string) => void;
+  onUpdateGameState?: (newState: string, triggerKey?: number) => void;
+
   withBorder?: boolean;
   borderStyle?: React.CSSProperties;
 }
@@ -52,6 +53,8 @@ const Cell: React.FC<CellProps> = ({
     left: false,
     right: false,
   });
+
+  const [busy, setBusy] = useState(false);
 
   const displayState = (() => {
     if (!cellData) return CellState.Unbroken;
@@ -77,32 +80,36 @@ const Cell: React.FC<CellProps> = ({
     e.preventDefault();
     if (displayState != CellState.Unbroken) return;
 
+    if (busy) return;
+
+    setBusy(true);
+
     api
       .post(`/beesweeper_api/${gameID}/single/`, { key: cellID })
       .then((response) => {
         onUpdateBoard?.(response.data.board); // 🔴 JUST SEND DELTAS
 
         if (response.data.progress) {
-          onUpdateGameState?.(response.data.progress);
+          onUpdateGameState?.(response.data.progress, cellID);
         }
-      });
+        onUpdateFlags?.(response.data.flags);
+      })
+      .finally(() => setBusy(false));
   };
 
   /** Handle right-click (flag) */
   const handleRightClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (displayState != CellState.Unbroken && displayState != CellState.Flagged)
-      return;
+    if (busy) return;
 
+    setBusy(true);
     api
       .post(`/beesweeper_api/${gameID}/flag/`, { key: cellID })
       .then((response) => {
         onUpdateBoard?.(response.data.board);
-
-        if (response.data.flags !== undefined) {
-          onUpdateFlags?.(response.data.flags);
-        }
-      });
+        onUpdateFlags?.(response.data.flags);
+      })
+      .finally(() => setBusy(false));
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -123,15 +130,21 @@ const Cell: React.FC<CellProps> = ({
   const triggerDoubleClickAction = () => {
     if (displayState === CellState.Unbroken) return;
 
+    if (busy) return;
+
+    setBusy(true);
+
     api
       .post(`/beesweeper_api/${gameID}/double/`, { key: cellID })
       .then((response) => {
         onUpdateBoard?.(response.data.board);
 
         if (response.data.progress) {
-          onUpdateGameState?.(response.data.progress);
+          onUpdateGameState?.(response.data.progress, cellID);
         }
-      });
+        onUpdateFlags?.(response.data.flags);
+      })
+      .finally(() => setBusy(false));
   };
 
   /** Render image based on displayState */
@@ -171,6 +184,7 @@ const Cell: React.FC<CellProps> = ({
 
   const cellElement = (
     <div
+      id={`cell-${cellID}`}
       className={`hexagon ${displayState.toLowerCase()}`}
       style={withBorder ? borderStyle : {}}
       onClick={handleClick}

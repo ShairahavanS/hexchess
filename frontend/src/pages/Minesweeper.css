@@ -16,7 +16,30 @@
   aspect-ratio: 1 / 1;
 }
 
-.board-complete {
+.win-pulse {
+  animation: winPulse 0.9s ease-out;
+}
+
+@keyframes winPulse {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  30% {
+    transform: scale(1.03);
+    filter: brightness(1.3);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+.oct-board-complete.WIN {
+  animation: winPulse 0.9s ease-out;
+}
+
+.oct-board-complete {
   background-color: black;
   display: flex;
   justify-content: space-between;
@@ -24,24 +47,50 @@
   height: 90vh;
 }
 
-.board-complete.dark {
+.oct-board-complete.dark {
   background-color: #121212;
   color: white;
 }
 
-.board-complete.light {
+.oct-board-complete.light {
   background-color: #b6c9e3;
   color: black;
 }
-.infoBoard {
+
+.oct-board-complete.dark {
+  background-color: #121212;
+  color: white;
+}
+
+.oct-board-complete.light {
+  background-color: #b6c9e3;
+  color: black;
+}
+
+.octInfoBoard {
   background-color: lightgray;
   width: 50vmin;
   margin-left: 0vmin;
 }
 
-.infoBoard {
-  background-color: lightgray;
-  position: fixed;
-  right: 20vmin;
-  width: 50vmin;
+body.shake {
+  animation: cameraShake 0.3s;
+}
+
+@keyframes cameraShake {
+  0% {
+    transform: translate(0);
+  }
+  25% {
+    transform: translate(-2px, 1px);
+  }
+  50% {
+    transform: translate(2px, -1px);
+  }
+  75% {
+    transform: translate(-3px, 1px);
+  }
+  100% {
+    transform: translate(0);
+  }
 }
