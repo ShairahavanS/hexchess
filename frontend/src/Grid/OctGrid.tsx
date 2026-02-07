@@ -11,6 +11,7 @@ interface GridProps {
   game_ID: string;
   board: MineCellInfo[];
   lostCellKey?: number | null;
+  gameMode: string;
   onUpdateBoard?: (changedCells: MineCellInfo[]) => void;
   onUpdateFlags: (newFlags: number) => void;
   onUpdateGameState?: (newState: string, triggerKey?: number) => void;
@@ -21,6 +22,7 @@ function OctGrid({
   game_ID,
   board,
   lostCellKey,
+  gameMode,
   onUpdateBoard,
   onUpdateFlags,
   onUpdateGameState,
@@ -69,6 +71,7 @@ function OctGrid({
             cellID={count}
             cellData={cellData}
             lostCellKey={lostCellKey}
+            gameMode={gameMode}
             onUpdateBoard={onUpdateBoard}
             onUpdateFlags={onUpdateFlags}
             onUpdateGameState={onUpdateGameState}
@@ -116,6 +119,7 @@ function OctGrid({
             cellID={count}
             cellData={cellData}
             lostCellKey={lostCellKey}
+            gameMode={gameMode}
             onUpdateBoard={onUpdateBoard}
             onUpdateFlags={onUpdateFlags}
             onUpdateGameState={onUpdateGameState}
@@ -165,6 +169,7 @@ function OctGrid({
             cellID={count}
             cellData={cellData}
             lostCellKey={lostCellKey}
+            gameMode={gameMode}
             onUpdateBoard={onUpdateBoard}
             onUpdateFlags={onUpdateFlags}
             onUpdateGameState={onUpdateGameState}

@@ -42,6 +42,7 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   const beesRef = useRef<BeeParticle[]>([]);
   const [bees, setBees] = useState<BeeParticle[]>([]);
   const rafRef = useRef<number | null>(null);
+  const beesSpawnedRef = useRef(false);
 
   // Replace entire board (start/reset)
   const replaceBoard = (newBoard: MineCellInfo[]) => {
@@ -91,6 +92,7 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   };
 
   const startGame = () => {
+    beesSpawnedRef.current = false;
     api.post("/beesweeper_api/start/", { level }).then((res) => {
       const newSides = getSides(level);
       setSides(newSides); // set sides immediately
@@ -103,7 +105,7 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
 
       setGameID(res.data.game_ID); // ✅ set gameID from backend
       setGameState(res.data.progress);
-      setFlags(flags);
+      setFlags(res.data.flags);
 
       // Lazy revelation: all hidden
       const hiddenBoard: MineCellInfo[] = Array.from(
@@ -124,21 +126,8 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
     startGame(); // start new game whenever level changes
   }, [level]);
 
-
-  
-
-  const handleGameState = (state: string, key?: number) => {
-    setGameState(state);
-    if (state === "LOST" && key !== undefined) {
-      setLostCellKey(key);
-    }
-  };
-
   useEffect(() => {
     if (gameState === "NS") {
-      setNumCells(
-        (sides * 2 - 2) * (sides * 2 - 1) - sides * (sides - 1) + 2 * sides - 1
-      );
       setTime(0);
     }
   }, [gameState, level]);
@@ -180,6 +169,8 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   const handleReset = () => {
     if (!gameID) return;
 
+    beesSpawnedRef.current = false;
+
     api.post(`/beesweeper_api/${gameID}/reset/`).then((res) => {
       // stop any ongoing timer immediately
       setStartTime(res.data.progress === "IP" ? Date.now() : null);
@@ -194,14 +185,18 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
     });
   };
 
-
-
-
-
-
+  const handleGameState = (state: string, key?: number) => {
+    setGameState(state);
+    if (state === "LOST" && key !== undefined) {
+      setLostCellKey(key); // 🔥
+    }
+  };
 
   useEffect(() => {
-    if (gameState !== "LOST" || lostCellKey === null) return;
+    if (gameState !== "LOST" || lostCellKey === null || beesSpawnedRef.current)
+      return;
+
+    beesSpawnedRef.current = true;
 
     const cellEl = document.getElementById(`cell-${lostCellKey}`);
     const container = document.querySelector(".hex-grid-area");
@@ -276,12 +271,13 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
             sideLength={sides}
             level={level}
             game_ID={gameID}
+            lostCellKey={lostCellKey}
             board={board}
             onUpdateBoard={mergeBoardChanges}
             onUpdateFlags={setFlags}
             onUpdateGameState={handleGameState}
           />
-          <div className="bee-particles">
+          {/* <div className="bee-particles">
             {bees.map((b) => (
               <div
                 key={b.id}
@@ -293,7 +289,7 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
                 }}
               />
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
       <div className={`beeInfoBoard ${darkMode ? "dark" : "light"}`}>

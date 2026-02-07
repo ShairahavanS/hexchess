@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Minesweeper.css";
-import OctGrid from "../Grid/OctGrid.tsx";
 import MinesweeperInfoBoard from "../MinesweeperInfoBoard/MinesweeperInfoBoard.tsx";
 import axios from "axios";
 import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
 import { BACKEND_URL } from "../constants.ts";
 import { table } from "console";
+import GenericGrid from "../Grid/GenericGrid.tsx";
 
 export const api = axios.create({
   baseURL: BACKEND_URL,
@@ -29,6 +29,7 @@ type BeeParticle = {
 
 const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
   const [level, setLevel] = useState("Easy");
+  const [gameMode, setGameMode] = useState("Octagon-Square");
   const [sides, setSides] = useState(6);
   const [numCells, setNumCells] = useState(91);
   const [flags, setFlags] = useState(18);
@@ -45,18 +46,83 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
     setBoard(newBoard);
   };
 
-  const getSides = (level: string) => {
-    switch (level) {
-      case "Easy":
-        return 5;
-      case "Medium":
-        return 9;
-      case "Hard":
-        return 13;
-      case "Extreme":
-        return 17;
-      case "Impossible":
-        return 21;
+  const getSides = (gameMode: string, level: string) => {
+    switch (gameMode) {
+      case "Octagon-Square":
+        switch (level) {
+          case "Easy":
+            return 5;
+          case "Medium":
+            return 9;
+          case "Hard":
+            return 13;
+          case "Extreme":
+            return 17;
+          case "Impossible":
+            return 21;
+          default:
+            return 5;
+        }
+      case "Square":
+        switch (level) {
+          case "Easy":
+            return 9;
+          case "Medium":
+            return 16;
+          case "Hard":
+            return 22;
+          case "Extreme":
+            return 30;
+          case "Impossible":
+            return 40;
+          default:
+            return 9;
+        }
+      case "Triangle":
+        switch (level) {
+          case "Easy":
+            return 5;
+          case "Medium":
+            return 9;
+          case "Hard":
+            return 13;
+          case "Extreme":
+            return 17;
+          case "Impossible":
+            return 21;
+          default:
+            return 5;
+        }
+      case "Square-Triangle":
+        switch (level) {
+          case "Easy":
+            return 5;
+          case "Medium":
+            return 9;
+          case "Hard":
+            return 13;
+          case "Extreme":
+            return 17;
+          case "Impossible":
+            return 21;
+          default:
+            return 5;
+        }
+      case "Hexagon-Square-Triangle":
+        switch (level) {
+          case "Easy":
+            return 5;
+          case "Medium":
+            return 9;
+          case "Hard":
+            return 13;
+          case "Extreme":
+            return 17;
+          case "Impossible":
+            return 21;
+          default:
+            return 5;
+        }
       default:
         return 5;
     }
@@ -89,13 +155,14 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
 
   const startGame = () => {
     api.post("/minesweeper_api/start/", { level }).then((res) => {
-      const newSides = getSides(level);
+      const newSides = getSides(gameMode, level);
       setSides(newSides); // set sides immediately
       const tableLength = 2 * sides - 1;
       const totalCells =
         tableLength * tableLength -
         2 * (Math.floor(tableLength / 2) * Math.floor(tableLength / 2 + 1));
       setNumCells(totalCells);
+      setLostCellKey(null);
 
       setGameID(res.data.game_ID); // ✅ set gameID from backend
       setGameState(res.data.progress);
@@ -122,35 +189,6 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
 
   useEffect(() => {
     if (gameState === "NS") {
-      switch (level) {
-        case "Easy":
-          setFlags(13);
-          setTime(0);
-          break;
-        case "Medium":
-          setFlags(54);
-          setTime(0);
-          break;
-        case "Hard":
-          setFlags(109);
-          setTime(0);
-          break;
-        case "Extreme":
-          setFlags(189);
-          setTime(0);
-          break;
-        case "Impossible":
-          setFlags(292);
-          setTime(0);
-          break;
-        default:
-          setFlags(13);
-          setTime(0);
-      }
-
-      setNumCells(
-        (sides * 2 - 2) * (sides * 2 - 1) - sides * (sides - 1) + 2 * sides - 1
-      );
       setTime(0);
     }
   }, [gameState, level]);
@@ -184,6 +222,7 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
       // stop any ongoing timer immediately
       setStartTime(res.data.progress === "IP" ? Date.now() : null);
       setTime(0);
+      setLostCellKey(null);
 
       // lazy reset board
       setBoard((prev) => prev.map((c) => ({ key: c.key, kind: "hidden" })));
@@ -198,8 +237,6 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
     setGameState(state);
     if (state === "LOST" && key !== undefined) {
       setLostCellKey(key);
-      console.log("BOOM");
-      console.log(key);
     }
   };
 
@@ -215,15 +252,7 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
     }
   }, [gameState]);
 
-  const MAX_SIDES = 24;
-  const FIXED_RATIO =
-    ((2 * MAX_SIDES - 1) / (3 * MAX_SIDES - 1)) * Math.sqrt(3);
-
-  const FIXED_WIDTH = 90 / FIXED_RATIO;
-
-  let ratio = ((2 * sides - 1) / (3 * sides - 1)) * Math.sqrt(3);
-  let height = 90;
-  let width = height / ratio;
+  const FIXED_WIDTH = 90;
 
   return (
     <div
@@ -239,11 +268,12 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
         }}
       >
         <div className="Minesweeper" onContextMenu={(e) => e.preventDefault()}>
-          <OctGrid
+          <GenericGrid
             sideLength={sides}
             level={level}
             game_ID={gameID}
             board={board}
+            gameMode={gameMode}
             lostCellKey={lostCellKey}
             onUpdateBoard={mergeBoardChanges}
             onUpdateFlags={setFlags}
@@ -255,9 +285,12 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
         <MinesweeperInfoBoard
           level={level}
           setLevel={setLevel}
+          gameMode={gameMode}
+          setGameMode={setGameMode}
           flagsLeft={flags}
           onReset={handleReset}
           time={time}
+          darkMode={darkMode}
         />
       </div>
       <div>

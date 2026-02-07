@@ -31,6 +31,7 @@ interface CellProps {
   gameID: string;
   cellID: number;
   cellData?: MineCellInfo;
+  lostCellKey?: number | null;
   onUpdateBoard?: (changedCells: MineCellInfo[]) => void;
   onUpdateFlags?: (newFlags: number) => void;
   onUpdateGameState?: (newState: string, triggerKey?: number) => void;
@@ -43,6 +44,7 @@ const Cell: React.FC<CellProps> = ({
   gameID,
   cellID,
   cellData,
+  lostCellKey,
   onUpdateBoard,
   onUpdateFlags,
   onUpdateGameState,
@@ -74,6 +76,8 @@ const Cell: React.FC<CellProps> = ({
         return CellState.Numbered; // "1".."8"
     }
   })();
+
+  const isLosingMine = cellData?.kind === "mine" && lostCellKey === cellID;
 
   /** Handle left click (reveal) */
   const handleClick = (e: React.MouseEvent) => {
@@ -185,7 +189,9 @@ const Cell: React.FC<CellProps> = ({
   const cellElement = (
     <div
       id={`cell-${cellID}`}
-      className={`hexagon ${displayState.toLowerCase()}`}
+      className={`hexagon ${displayState.toLowerCase()} ${
+        isLosingMine ? "explode" : ""
+      }`}
       style={withBorder ? borderStyle : {}}
       onClick={handleClick}
       onContextMenu={handleRightClick}

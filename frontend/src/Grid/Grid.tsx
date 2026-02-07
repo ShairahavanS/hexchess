@@ -10,15 +10,17 @@ interface GridProps {
   level: string;
   game_ID: string;
   board: MineCellInfo[];
+  lostCellKey?: number | null;
   onUpdateBoard?: (changedCells: MineCellInfo[]) => void;
   onUpdateFlags: (newFlags: number) => void;
-  onUpdateGameState?: (newState: string) => void;
+  onUpdateGameState?: (state: string, triggerKey?: number) => void;
 }
 
 function Grid({
   sideLength,
   game_ID,
   board,
+  lostCellKey,
   onUpdateBoard,
   onUpdateFlags,
   onUpdateGameState,
@@ -56,6 +58,7 @@ function Grid({
             gameID={game_ID}
             cellID={count}
             cellData={cellData}
+            lostCellKey={lostCellKey}
             onUpdateBoard={onUpdateBoard}
             onUpdateFlags={onUpdateFlags}
             onUpdateGameState={onUpdateGameState}
@@ -104,6 +107,7 @@ function Grid({
             gameID={game_ID}
             cellID={count}
             cellData={cellData}
+            lostCellKey={lostCellKey}
             onUpdateBoard={onUpdateBoard}
             onUpdateFlags={onUpdateFlags}
             onUpdateGameState={onUpdateGameState}

@@ -1,81 +1,116 @@
 .minesweeper-info-board {
   display: flex;
   flex-direction: column;
+  gap: 14px;
+  padding: 18px 22px;
+  border-radius: 12px;
+  width: 320px;
+  margin: 20px auto;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- Light Mode ---------- */
+.minesweeper-info-board.light {
+  background: #f4f6fb;
+  color: #111;
+}
+
+/* ---------- Dark Mode ---------- */
+.minesweeper-info-board.dark {
+  background: #1a1c22;
+  color: #f1f1f1;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+}
+
+/* ---------- Info Rows ---------- */
+.info-item {
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  background-color: #f4f4f4;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 300px; /* Set a fixed width for the board */
-  margin: 20px auto;
+  gap: 10px;
+  font-size: 1.2rem;
 }
 
-.info-item {
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-h3 {
-  font-size: 1.5rem;
-  color: #333;
-}
-
-.oct-reset-button {
-  padding: 10px 15px;
-  background-color: #ff4444;
-  color: white;
-  font-size: 1rem;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.oct-reset-button:hover {
-  background-color: #cc3333;
-}
-
-.oct-level-selector {
-  padding: 5px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-select:focus {
-  outline: none;
-  border-color: #888;
-}
-
-label {
-  font-size: 1rem;
-  margin-right: 10px;
-}
-
-.info-item span {
-  display: inline-block;
-  min-width: 50px; /* Adjust based on max expected timer value */
-  text-align: left;
-}
-
+/* icons */
 .icon {
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0; /* Prevent the icon from shrinking */
+  width: 26px;
+  height: 26px;
 }
 
-.info-item.level-row {
+/* numbers */
+.minesweeper-info-board h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ---------- Reset Button ---------- */
+.reset-button {
+  padding: 10px 18px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.minesweeper-info-board.light .reset-button {
+  background: #ff4d4d;
+  color: white;
+}
+
+.minesweeper-info-board.dark .reset-button {
+  background: #ff5c5c;
+  color: white;
+}
+
+.reset-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+/* ---------- Select Rows ---------- */
+.level-row,
+.game-mode-row {
   display: flex;
-  justify-content: center; /* center items inside the row */
   align-items: center;
-  gap: 10px; /* space between label and select */
-  width: auto; /* shrink to fit content */
-  margin: 0 auto; /* center the row itself inside parent */
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
 }
 
-.info-item.level-row label,
-.info-item.level-row select {
-  color: #333; /* dark text color */
+/* labels */
+.minesweeper-info-board label {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+/* selects */
+.level-selector,
+.game-mode-selector {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* light selects */
+.minesweeper-info-board.light select {
+  background: #ffffff;
+  color: #111;
+}
+
+/* dark selects */
+.minesweeper-info-board.dark select {
+  background: #2a2d36;
+  color: #f1f1f1;
+}
+
+/* focus */
+select:focus {
+  box-shadow: 0 0 0 2px rgba(100, 150, 255, 0.5);
 }

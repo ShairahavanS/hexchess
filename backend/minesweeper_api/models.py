@@ -4,6 +4,64 @@ import random
 import uuid
 from collections import deque
 
+class Geometry:
+    def __init__(self, game_mode: str, side_length: int):
+        self.mode = game_mode
+        self.side = side_length
+        self.rows = 0
+        self.columns = 0
+        self.numCells = 0
+        self.compute_dimensions()
+
+    def compute_dimensions(self):
+        if self.mode == "Octagon-Square":
+            self.columns = 2*self.side - 1
+            self.rows = self.columns
+            cut = self.side // 2
+            self.numCells = self.columns*self.rows - 2*(cut*(cut+1))
+        elif self.mode == "Square":
+            self.columns = self.side
+            self.rows = self.side
+            self.numCells = self.columns*self.rows
+        elif self.mode == "Triangle":
+            self.columns = self.side
+            self.rows = self.side
+            self.numCells = sum(range(1, self.side+1))  # triangular number
+        else:
+            self.columns = self.side
+            self.rows = self.side
+            self.numCells = self.side*self.side
+
+    def is_out_of_bounds(self, col, row):
+        cx = (self.columns - 1)/2
+        cy = (self.rows - 1)/2
+
+        if self.mode == "Octagon-Square":
+            square_radius = self.side - 1
+            cut = self.side // 2
+            diamond_radius = 2*(self.side-1) - cut
+            return not (abs(col-cx) <= square_radius and abs(row-cy) <= square_radius and abs(col-cx)+abs(row-cy) <= diamond_radius)
+        elif self.mode == "Square":
+            return False
+        elif self.mode == "Triangle":
+            return row > col  # example for upright triangle
+        return False
+    
+    def get_directions(self, row, col):
+        if self.mode == "Octagon-Square":
+            if ((col + row) % 2 == 0):
+                return [(-1,0),(1,0),(0,-1),(0,1), (-1,-1),(-1,1),(1,-1),(1,1)]
+            else:
+                return [(-1,0),(1,0),(0,-1),(0,1)]
+        elif self.mode == "Square":
+            return [(-1,0),(1,0),(0,-1),(0,1), (-1,-1),(-1,1),(1,-1),(1,1)]
+        elif self.mode == "Triangle":
+            if ((col + row) % 2 == 0):
+                return [(1, 0), (-1, 0), (0, -1)]
+            else:
+                return [(1, 0), (-1, 0), (0, 1)]
+        return False
+
 
 class Cell(models.Model):
     column = models.IntegerField(default=11)
@@ -326,7 +384,6 @@ class Game(models.Model):
                         count += 1
 
             cell.adjacent = count
-            print(count)
 
         # --------------------------------------------------
         # OPTIMIZED: one bulk update

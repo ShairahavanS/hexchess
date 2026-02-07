@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import "./OctCell.css";
-import "../CellBorder/OctCellBorder.css"; // Merge CSS files or keep separate
+import "./SquareCell.css";
 import mine from "../images/minesweeper/Mine.svg";
 import flag from "../images/minesweeper/Flag.svg";
 import one from "../images/minesweeper/Number1.svg";
@@ -11,7 +10,7 @@ import five from "../images/minesweeper/Number5.svg";
 import six from "../images/minesweeper/Number6.svg";
 import trophy from "../images/minesweeper/Trophy.svg";
 import axios from "axios";
-import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
+import { MineCellInfo } from "./MineCellInfo.tsx";
 import { BACKEND_URL } from "../constants.ts";
 
 export const api = axios.create({
@@ -27,7 +26,7 @@ export enum CellState {
   Trophy = "trophy",
 }
 
-interface OctCellProps {
+interface SquareCellProps {
   gameID: string;
   cellShape: string;
   cellID: number;
@@ -41,7 +40,7 @@ interface OctCellProps {
   borderStyle?: React.CSSProperties;
 }
 
-const OctCell: React.FC<OctCellProps> = ({
+const SquareCell: React.FC<SquareCellProps> = ({
   gameID,
   cellShape,
   cellID,
@@ -190,8 +189,7 @@ const OctCell: React.FC<OctCellProps> = ({
     <div
       id={`cell-${cellID}`}
       className={`
-      oct-cell
-      ${cellShape === "square" ? "oct-square" : "octagon"}
+      square
       ${displayState.toLowerCase()}
       ${isLosingMine ? "explode" : ""}
     `}
@@ -208,4 +206,4 @@ const OctCell: React.FC<OctCellProps> = ({
   return cellElement;
 };
 
-export default OctCell;
+export default SquareCell;

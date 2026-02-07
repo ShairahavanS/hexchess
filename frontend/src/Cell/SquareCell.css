@@ -1,39 +1,9 @@
-/* Hexagon Styling */
+/* Square Styling */
 
-.octagon {
-  background-color: blue;
-  width: 90%; /* Adjust the size of the hexagon */
-  height: 90%; /* Adjust the height for the hexagon */
-  clip-path: polygon(
-    29.29% 0,
-    70.71% 0,
-    100% 29.29%,
-    100% 70.71%,
-    70.71% 100%,
-    29.29% 100%,
-    0 70.71%,
-    0 29.29%
-  ); /* Hexagonal shape */
-
-  display: flex;
-  align-items: center; /* Vertically center the content */
-  justify-content: center; /* Horizontally center the content */
-  cursor: pointer; /* Cursor pointer on hover */
-
-  position: relative; /* Ensure flexbox works correctly */
-}
-
-.oct-square {
+.square {
   background-color: rgb(253, 119, 1);
   width: 90%; /* Adjust the size of the hexagon */
   height: 90%; /* Adjust the height for the hexagon */
-  clip-path: polygon(
-    29.29% 29.29%,
-    70.71% 29.29%,
-    70.71% 70.71%,
-    29.29% 70.71%
-  ); /* Hexagonal shape */
-
   display: flex;
   align-items: center; /* Vertically center the content */
   justify-content: center; /* Horizontally center the content */
@@ -43,7 +13,7 @@
 }
 
 /* Image inside the hexagon */
-.octagon img {
+.square img {
   position: absolute;
   width: 75%; /* Adjust the image size relative to the hexagon */
   height: 75%; /* Ensure the image maintains its aspect ratio */
@@ -53,90 +23,43 @@
   pointer-events: none; /* Ignore pointer events on the image (so clicks go to the cell) */
 }
 
-.oct-square img {
-  position: absolute;
-  width: 35%; /* Adjust the image size relative to the hexagon */
-  height: 35%; /* Ensure the image maintains its aspect ratio */
-  object-fit: contain; /* Maintain image aspect ratio without stretching */
-  user-select: none; /* Prevent text/image selection */
-  -webkit-user-drag: none; /* Prevent dragging images in WebKit browsers */
-  pointer-events: none; /* Ignore pointer events on the image (so clicks go to the cell) */
-}
-
-.octagon.unbroken:hover {
+.square.unbroken:hover {
   background-color: rgb(29, 7, 199);
 }
 
-.octagon.flagged:hover {
+.square.flagged:hover {
   background-color: rgb(29, 7, 199);
 }
 
-.octagon.unbroken {
+.square.unbroken {
   background-color: blue; /* or your default color */
 }
 
-.octagon.flagged {
+.square.flagged {
   background-color: blue; /* or your default color */
 }
 
-.octagon.empty {
+.square.empty {
   background-color: tan;
   cursor: default;
 }
 
-.octagon.numbered {
+.square.numbered {
   background-color: tan;
   cursor: default;
 }
 
-.octagon.mine {
+.square.mine {
   background-color: red;
   cursor: default;
 }
 
-.octagon.trophy {
+.square.trophy {
   background-color: rgb(102, 255, 0);
   cursor: default;
 }
 
-.oct-square.unbroken:hover {
-  background-color: rgb(176, 67, 4);
-}
-
-.oct-square.flagged:hover {
-  background-color: rgb(176, 67, 4);
-}
-
-.oct-square.unbroken {
-  background-color: rgb(253, 119, 1); /* or your default color */
-}
-
-.oct-square.flagged {
-  background-color: rgb(253, 119, 1); /* or your default color */
-}
-
-.oct-square.empty {
-  background-color: tan;
-  cursor: default;
-}
-
-.oct-square.numbered {
-  background-color: tan;
-  cursor: default;
-}
-
-.oct-square.mine {
-  background-color: red;
-  cursor: default;
-}
-
-.oct-square.trophy {
-  background-color: rgb(102, 255, 0);
-  cursor: default;
-}
-
-.octagon.trophy,
-.oct-square.trophy {
+.square.trophy {
   animation: trophyGlow 1.2s ease-in-out infinite;
 }
 
@@ -152,7 +75,7 @@
   }
 }
 
-.oct-cell.explode {
+.square.explode {
   animation: explode 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2);
   z-index: 10;
 }
@@ -177,8 +100,8 @@
   }
 }
 
-.oct-cell.explode::before,
-.oct-cell.explode::after {
+.square-cell.explode::before,
+.square-cell.explode::after {
   content: "";
   position: absolute;
   inset: -25%;
@@ -186,7 +109,7 @@
   pointer-events: none;
 }
 
-.oct-cell.explode::before {
+.square-cell.explode::before {
   background: radial-gradient(
     circle,
     rgba(255, 180, 0, 0.9) 0%,
@@ -196,15 +119,6 @@
   );
   animation: fireBurst 0.45s ease-out;
 }
-/* .oct-cell.explode::after {
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 200, 0.8) 0%,
-    rgba(255, 200, 0, 0.6) 30%,
-    transparent 65%
-  );
-  animation: flash 0.2s ease-out;
-} */
 
 @keyframes fireBurst {
   0% {
