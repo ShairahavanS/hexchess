@@ -135,8 +135,8 @@
   cursor: default;
 }
 
-.octagon.trophy,
-.oct-square.trophy {
+.octagon.trophy img,
+.oct-square.trophy img {
   animation: trophyGlow 1.2s ease-in-out infinite;
 }
 

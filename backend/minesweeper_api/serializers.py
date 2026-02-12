@@ -36,6 +36,7 @@ class GameInitSerializer(serializers.ModelSerializer):
         model = Game
         fields = [
             "game_ID",
+            "gameMode",
             "progress",
             "level",
             "mines",
@@ -51,6 +52,7 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         fields = [
             "game_ID",
+            "gameMode",
             "progress",
             "level",
             "mines",
@@ -72,6 +74,7 @@ class GameSingleMoveSerializer(serializers.ModelSerializer):
         model = Game
         fields = [
             "game_ID",
+            "gameMode",
             "progress",
             "level",
             "mines",

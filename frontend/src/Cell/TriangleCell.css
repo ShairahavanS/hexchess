@@ -1,9 +1,10 @@
 /* Square Styling */
 
-.square {
+.triangle-up {
   background-color: rgb(253, 119, 1);
   width: 90%; /* Adjust the size of the hexagon */
   height: 90%; /* Adjust the height for the hexagon */
+  clip-path: polygon(50% 0, 0% 100%, 100% 100%);
   display: flex;
   align-items: center; /* Vertically center the content */
   justify-content: center; /* Horizontally center the content */
@@ -12,54 +13,113 @@
   position: relative; /* Ensure flexbox works correctly */
 }
 
-/* Image inside the hexagon */
-.square img {
+.triangle-down {
+  background-color: rgb(253, 119, 1);
+  width: 90%; /* Adjust the size of the hexagon */
+  height: 90%; /* Adjust the height for the hexagon */
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  display: flex;
+  align-items: center; /* Vertically center the content */
+  justify-content: center; /* Horizontally center the content */
+  cursor: pointer; /* Cursor pointer on hover */
+
+  position: relative; /* Ensure flexbox works correctly */
+}
+
+.triangle-up img {
   position: absolute;
-  width: 75%; /* Adjust the image size relative to the hexagon */
-  height: 75%; /* Ensure the image maintains its aspect ratio */
-  object-fit: contain; /* Maintain image aspect ratio without stretching */
-  user-select: none; /* Prevent text/image selection */
-  -webkit-user-drag: none; /* Prevent dragging images in WebKit browsers */
-  pointer-events: none; /* Ignore pointer events on the image (so clicks go to the cell) */
+  width: 45%;
+  height: 45%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+
+  left: 50%;
+  top: 66.666%;
+  transform: translate(-50%, -50%);
 }
 
-.square.unbroken:hover {
-  background-color: rgb(29, 7, 199);
+.triangle-down img {
+  position: absolute;
+  width: 45%;
+  height: 45%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+
+  left: 50%;
+  top: 33.333%;
+  transform: translate(-50%, -50%);
 }
 
-.square.flagged:hover {
-  background-color: rgb(29, 7, 199);
+.triangle-up.unbroken:hover {
+  background-color: darkblue;
 }
 
-.square.unbroken {
+.triangle-down.unbroken:hover {
+  background-color: orange;
+}
+
+.triangle-up.flagged:hover {
+  background-color: blue;
+}
+
+.triangle-down.flagged:hover {
+  background-color: rgb(216, 216, 45);
+}
+
+.triangle-up.unbroken {
   background-color: blue; /* or your default color */
 }
 
-.square.flagged {
+.triangle-down.unbroken {
+  background-color: rgb(216, 216, 45); /* or your default color */
+}
+
+.triangle-up.flagged {
   background-color: blue; /* or your default color */
 }
 
-.square.empty {
+.triangle-down.flagged {
+  background-color: rgb(216, 216, 45); /* or your default color */
+}
+
+.triangle-up.empty {
   background-color: tan;
   cursor: default;
 }
 
-.square.numbered {
+.triangle-down.empty {
+  background-color: rgb(171, 141, 102);
+  cursor: default;
+}
+
+.triangle-up.numbered {
   background-color: tan;
   cursor: default;
 }
 
-.square.mine {
+.triangle-down.numbered {
+  background-color: rgb(171, 141, 102);
+  cursor: default;
+}
+
+.triangle-up.mine,
+.triangle-down.mine {
   background-color: red;
   cursor: default;
 }
 
-.square.trophy {
+.triangle-up.trophy,
+.triangle-down.trophy {
   background-color: rgb(102, 255, 0);
   cursor: default;
 }
 
-.square.trophy img {
+.triangle-up.trophy img,
+.triangle-down.trophy img {
   animation: trophyGlow 1.2s ease-in-out infinite;
 }
 
@@ -75,7 +135,8 @@
   }
 }
 
-.square.explode {
+.triangle-up.explode,
+.triangle-down.explode {
   animation: explode 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2);
   z-index: 10;
 }
@@ -100,8 +161,8 @@
   }
 }
 
-.square-cell.explode::before,
-.square-cell.explode::after {
+.triangle-cell.explode::before,
+.triangle-cell.explode::after {
   content: "";
   position: absolute;
   inset: -25%;
@@ -109,7 +170,7 @@
   pointer-events: none;
 }
 
-.square-cell.explode::before {
+.triangle-cell.explode::before {
   background: radial-gradient(
     circle,
     rgba(255, 180, 0, 0.9) 0%,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./SquareCell.css";
+import "./FishCell.css";
 import mine from "../images/minesweeper/Mine.svg";
 import flag from "../images/minesweeper/Flag.svg";
 import one from "../images/minesweeper/Number1.svg";
@@ -26,7 +26,7 @@ export enum CellState {
   Trophy = "trophy",
 }
 
-interface SquareCellProps {
+interface FishCellProps {
   gameID: string;
   cellShape: string;
   cellID: number;
@@ -38,9 +38,10 @@ interface SquareCellProps {
   onUpdateGameState?: (state: string, triggerKey?: number) => void;
   withBorder?: boolean;
   borderStyle?: React.CSSProperties;
+  colorIndex: number;
 }
 
-const SquareCell: React.FC<SquareCellProps> = ({
+const FishCell: React.FC<FishCellProps> = ({
   gameID,
   cellShape,
   cellID,
@@ -52,6 +53,7 @@ const SquareCell: React.FC<SquareCellProps> = ({
   onUpdateGameState,
   withBorder = false,
   borderStyle,
+  colorIndex,
 }) => {
   const [mouseButtons, setMouseButtons] = useState({
     left: false,
@@ -191,11 +193,15 @@ const SquareCell: React.FC<SquareCellProps> = ({
     }
   };
 
+  // instead of using cellID % 3
+  const colorClass = `fish-color-${colorIndex ?? 0}`;
+
   const cellElement = (
     <div
       id={`cell-${cellID}`}
       className={`
-      square
+      fish
+      ${colorClass}
       ${displayState.toLowerCase()}
       ${isLosingMine ? "explode" : ""}
     `}
@@ -212,4 +218,4 @@ const SquareCell: React.FC<SquareCellProps> = ({
   return cellElement;
 };
 
-export default SquareCell;
+export default FishCell;

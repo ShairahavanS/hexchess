@@ -10,7 +10,8 @@ import uuid
 class StartGame(APIView):
     def post(self, request, format=None):
         level = request.data.get('level', 'Easy')
-        game = Game.objects.create(level=level)
+        gameMode = request.data.get('gameMode', 'Octagon-Square')
+        game = Game.objects.create(level=level, gameMode=gameMode)
         game.create_board()
         game.save()
 

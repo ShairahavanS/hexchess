@@ -5,9 +5,9 @@ import uuid
 from collections import deque
 
 class Geometry:
-    def __init__(self, game_mode: str, side_length: int):
-        self.mode = game_mode
-        self.side = side_length
+    def __init__(self, mode: str, side: int):
+        self.mode = mode
+        self.side = side
         self.rows = 0
         self.columns = 0
         self.numCells = 0
@@ -15,22 +15,36 @@ class Geometry:
 
     def compute_dimensions(self):
         if self.mode == "Octagon-Square":
-            self.columns = 2*self.side - 1
+            self.columns = 2 * self.side - 1
             self.rows = self.columns
             cut = self.side // 2
-            self.numCells = self.columns*self.rows - 2*(cut*(cut+1))
+            self.numCells = self.columns * self.rows - 2 * (cut * (cut+1))
         elif self.mode == "Square":
             self.columns = self.side
             self.rows = self.side
-            self.numCells = self.columns*self.rows
-        elif self.mode == "Triangle":
+            self.numCells = self.columns * self.rows
+        elif self.mode == "Fish":
             self.columns = self.side
             self.rows = self.side
-            self.numCells = sum(range(1, self.side+1))  # triangular number
+            self.numCells = self.columns * self.rows
+        elif self.mode == "Triangle":
+            self.columns = 2*self.side-1
+            self.rows = self.side
+            self.numCells = sum(range(1,2*self.side+1, 2))
+        elif self.mode == "Hexagon-Square-Triangle":
+            self.columns = 4*self.side - 3
+            self.rows = 2*self.side - 1
+            
+            tempSum = sum(range(2*self.side+1,4*self.side - 4, 4))
+            if (2*self.side+1) == (4*self.side - 5):
+                tempSum = 2*self.side+1
+            print(tempSum)
+            self.numCells = 2*self.side - 1 + 2*sum(range(self.side,2*self.side-1, 2))+2*tempSum
+            print(self.numCells)
         else:
             self.columns = self.side
             self.rows = self.side
-            self.numCells = self.side*self.side
+            self.numCells = self.columns * self.rows
 
     def is_out_of_bounds(self, col, row):
         cx = (self.columns - 1)/2
@@ -40,28 +54,79 @@ class Geometry:
             square_radius = self.side - 1
             cut = self.side // 2
             diamond_radius = 2*(self.side-1) - cut
-            return not (abs(col-cx) <= square_radius and abs(row-cy) <= square_radius and abs(col-cx)+abs(row-cy) <= diamond_radius)
-        elif self.mode == "Square":
-            return False
+            return not (
+                abs(col-cx) <= square_radius and
+                abs(row-cy) <= square_radius and
+                abs(col-cx)+abs(row-cy) <= diamond_radius
+            )
         elif self.mode == "Triangle":
-            return row > col  # example for upright triangle
-        return False
-    
+            return (
+                row > col or
+                row > (self.columns - 1 - col)
+            )
+        return False  # Square & default: no out-of-bounds
+
     def get_directions(self, row, col):
+        """
+        Return a list of neighbor offsets based on mode.
+        """
         if self.mode == "Octagon-Square":
-            if ((col + row) % 2 == 0):
-                return [(-1,0),(1,0),(0,-1),(0,1), (-1,-1),(-1,1),(1,-1),(1,1)]
-            else:
+            if (row + col) % 2 == 0:  # octagon
+                return [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]
+            else:  # square
                 return [(-1,0),(1,0),(0,-1),(0,1)]
         elif self.mode == "Square":
-            return [(-1,0),(1,0),(0,-1),(0,1), (-1,-1),(-1,1),(1,-1),(1,1)]
+            return [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]
+        elif self.mode == "Fish":
+            return [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]
         elif self.mode == "Triangle":
-            if ((col + row) % 2 == 0):
-                return [(1, 0), (-1, 0), (0, -1)]
-            else:
-                return [(1, 0), (-1, 0), (0, 1)]
-        return False
-
+            if (row + col) % 2 == 0:  # upward triangle ▲
+                return [
+                    (0, -1), 
+                    (-1, 0),  
+                    (1, 0),  
+                    (0,1),
+                    (1,1),
+                    (-1,1),
+                    (-2, 0),  
+                    (2, 0),  
+                    (1, -1), 
+                    (-1, -1),
+                    (2, -1), 
+                    (-2, -1),
+                ]
+                # return [
+                #     (0, -1),   # top
+                #     (-1, 0),   # bottom-left
+                #     (1, 0),    # bottom-right
+                # ]
+            else:  # downward triangle ▼
+                return [
+                    (0, 1),    # bottom
+                    (1, 1),
+                    (2, 1),
+                    (-1, 1),
+                    (-2, 1),
+                    (-1, 0),   # top-left
+                    (1, 0),    # top-right
+                    (-2, 0),   
+                    (2, 0),
+                    (0, -1),
+                    (1, -1),
+                    (-1, -1),
+                ]
+                # return [
+                #     (0, 1),    # bottom
+                #     (-1, 0),   # top-left
+                #     (1, 0),    # top-right
+                # ]
+        elif self.mode == "Hexagon-Square-Triangle":
+            if (row + col) % 2 == 0:  # square
+                return [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+            elif (row%2 == 0):
+                return [(-1,0),(1,0),(0,-1),(0,1)]
+            
+        return [(0, 1), (0, -1), (-1, 0), (1, 0)]
 
 class Cell(models.Model):
     column = models.IntegerField(default=11)
@@ -75,18 +140,6 @@ class Cell(models.Model):
     startingPoint = models.BooleanField(default=False)
     trophy = models.BooleanField(default=False)
 
-    def is_octagon(self):
-        return (self.row + self.column) % 2 == 0
-
-    def directions(self):
-        # Base 4-neighbors
-        dirs = [(0, -1), (0, 1), (-1, 0), (1, 0)]
-
-        # Octagons have diagonals
-        if self.is_octagon():
-            dirs += [(-1, -1), (-1, 1), (1, -1), (1, 1)]
-
-        return dirs
     
     def reset(self):
         self.mine = False
@@ -99,7 +152,15 @@ class Cell(models.Model):
 
 
 class Game(models.Model):
+    def get_geometry(self):
+        # Always returns a Geometry object
+        if not hasattr(self, "_geometry"):
+            self._geometry = Geometry(self.gameMode, self.sideLength)
+        return self._geometry
+
+
     game_ID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    gameMode = models.CharField(max_length=25, choices=[("Octagon-Square", "Octagon Square"), ("Square", "Square"), ("Triangle", "Triangle"), ("Square-Triangle", "Square Triangle"), ("Fish", "Fish"), ("Hexagon-Square-Triangle", "Hexagon Square Triangle")], default="Octagon-Square")
     progress = models.CharField(max_length=5, choices=[("NS", "Not Started"), ("IP", "In Progress"), ("WIN", "Win"), ("LOST", "Lost")], default="NS")
     level = models.CharField(max_length=20, choices=[("Easy", "Easy"), ("Medium", "Medium"), ("Hard", "Hard"), ("Extreme", "Extreme"), ("Impossible", "Impossible")], default="Easy")
     sideLength = models.IntegerField(default=5)
@@ -162,8 +223,8 @@ class Game(models.Model):
             self.numberRevealed -= 1
 
             if cell.adjacent == 0:
-                for dx, dy in [(-1,0),(1,0),(0,-1),(0,1),
-                            (-1,-1),(-1,1),(1,-1),(1,1)]:
+                geo = self.get_geometry()
+                for dx, dy in geo.get_directions(cell.row, cell.column):
                     nkey = self.get_key_from_coordinates(col+dx, row+dy)
                     if nkey:
                         queue.append(nkey)
@@ -173,22 +234,27 @@ class Game(models.Model):
         # -----------------------------
         # Board size logic (unchanged)
         # -----------------------------
-        if self.level == 'Easy':
-            self.sideLength = 5
-        elif self.level == 'Medium':
-            self.sideLength = 9
-        elif self.level == 'Hard':
-            self.sideLength = 13
-        elif self.level == 'Extreme':
-            self.sideLength = 17
-        elif self.level == 'Impossible':
-            self.sideLength = 21
+        if self.gameMode == "Octagon-Square":
+            sizes = {"Easy":5,"Medium":9,"Hard":13,"Extreme":17,"Impossible":21}
+        elif self.gameMode == "Square":
+            sizes = {"Easy":9,"Medium":16,"Hard":22,"Extreme":30,"Impossible":40}
+        elif self.gameMode == "Fish":
+            sizes = {"Easy":6,"Medium":10,"Hard":14,"Extreme":18,"Impossible":22}
+        elif self.gameMode == "Triangle":
+            sizes = {"Easy":9,"Medium":16,"Hard":22,"Extreme":30,"Impossible":40}
+        elif self.gameMode == "Hexagon-Square-Triangle":
+            sizes = {"Easy":3,"Medium":5,"Hard":13,"Extreme":17,"Impossible":21}
         else:
-            self.sideLength = 5
+            sizes = {"Easy":5,"Medium":9,"Hard":13,"Extreme":17,"Impossible":21}
 
-        self.columns = 2*self.sideLength -1
-        self.rows = self.columns
-        self.numCells = self.columns*self.rows-2*(int(self.sideLength/2)*int((self.sideLength/2+1)))
+        self.sideLength = sizes.get(self.level, 5)
+
+
+        self.geometry = Geometry(self.gameMode, self.sideLength)
+        self.columns = self.geometry.columns
+        self.rows = self.geometry.rows
+        self.numCells = self.geometry.numCells
+
         self.mines = int(0.2 * self.numCells)
         self.numberRevealed = self.numCells - self.mines
         self.flags = self.mines
@@ -199,22 +265,10 @@ class Game(models.Model):
         cells = []
         cell_map = {}  # (col, row) -> Cell
 
-        cx = (self.columns - 1) / 2
-        cy = (self.rows - 1) / 2
-
-        square_radius = self.sideLength - 1
-        cut = self.sideLength // 2
-        diamond_radius = 2 * (self.sideLength - 1) - cut
-
         for col in range(self.columns):
+
             for row in range(self.rows):
-                
-                # yep
-                outofBounds = not (
-                    abs(col - cx) <= square_radius and
-                    abs(row - cy) <= square_radius and
-                    abs(col - cx) + abs(row - cy) <= diamond_radius
-                )
+                outofBounds = self.geometry.is_out_of_bounds(col, row)
 
                 cell = Cell(
                     column=col,
@@ -227,6 +281,7 @@ class Game(models.Model):
                     startingPoint=False,
                     adjacent=0,
                 )
+
                 cells.append(cell)
                 cell_map[(col, row)] = cell
 
@@ -250,7 +305,7 @@ class Game(models.Model):
                     self.key_map[str(key)] = [col, row]   # OPTIMIZED: JSON-safe
                     self.reverse_key_map[f"{col},{row}"] = key
                     key += 1
-
+                    
         # --------------------------------------------------
         # OPTIMIZED: bulk update instead of per-cell save
         # --------------------------------------------------
@@ -280,71 +335,36 @@ class Game(models.Model):
     def get_key_from_coordinates(self, col, row):
         return self.reverse_key_map.get(f"{col},{row}")
         # return self.reverse_key_map.get((col, row))
-    
+
     def set_starting_point(self, key):
         coordinates = self.get_coordinates_from_key(key)
         if not coordinates:
             return
-        columnNumber, rowNumber = coordinates
 
-        cell = self.board.filter(column=columnNumber, row = rowNumber).first()
-        cell.startingPoint = True
-        cell.save()
+        col, row = coordinates
+        geo = self.get_geometry()
 
-        if rowNumber - 1 >= 0:  # Ensure we don't go out of bounds
-            cell = self.board.filter(column=columnNumber, row=rowNumber-1, outofBounds=False).first()
-            if cell:
-                cell.startingPoint = True
-                cell.save()
+        cells = list(self.board.all())
+        cell_map = {(c.column, c.row): c for c in cells}
 
-        # Down 2 rows
-        if rowNumber + 1 < self.rows:  # Ensure we don't go out of bounds
-            cell = self.board.filter(column=columnNumber, row=rowNumber+1, outofBounds=False).first()
-            if cell:
-                cell.startingPoint = True
-                cell.save()
-        
-        if columnNumber - 1 >= 0:  # Ensure we don't go out of bounds
-            cell = self.board.filter(column=columnNumber-1, row=rowNumber, outofBounds=False).first()
-            if cell:
-                cell.startingPoint = True
-                cell.save()
+        # mark center
+        center = cell_map.get((col, row))
+        if not center:
+            return
 
-        # Down 2 rows
-        if columnNumber + 1 < self.columns:  # Ensure we don't go out of bounds
-            cell = self.board.filter(column=columnNumber+1, row=rowNumber, outofBounds=False).first()
-            if cell:
-                cell.startingPoint = True
-                cell.save()
-        
+        center.startingPoint = True
 
-        # Top-right diagonal (1 row up, 1 column right)
-        if columnNumber + 1 < self.columns and rowNumber - 1 >= 0:  # Check bounds
-            cell = self.board.filter(column=columnNumber+1, row=rowNumber-1, outofBounds=False).first()
-            if cell:
-                cell.startingPoint = True
-                cell.save()
+        # mark neighbors using geometry
+        for dcol, drow in geo.get_directions(row, col):
+            ncol = col + dcol
+            nrow = row + drow
+            neighbour = cell_map.get((ncol, nrow))
+            if neighbour and not neighbour.outofBounds:
+                neighbour.startingPoint = True
 
-        # Bottom-right diagonal (1 row down, 1 column right)
-        if columnNumber + 1 < self.columns and rowNumber + 1 < self.rows:  # Check bounds
-            cell = self.board.filter(column=columnNumber+1, row=rowNumber+1, outofBounds=False).first()
-            if cell:
-                cell.startingPoint = True
-                cell.save()
+        # single bulk update
+        Cell.objects.bulk_update(cells, ["startingPoint"], batch_size=1000)
 
-        # Top-left diagonal (1 row up, 1 column left)
-        if columnNumber - 1 >= 0 and rowNumber - 1 >= 0:  # Check bounds
-            cell = self.board.filter(column=columnNumber-1, row=rowNumber-1, outofBounds=False).first()
-            if cell:
-                cell.startingPoint = True
-                cell.save()
-
-        # Bottom-left diagonal (1 row down, 1 column left)
-        if columnNumber - 1 >= 0 and rowNumber + 1 < self.rows:  # Check bounds
-            cell = self.board.filter(column=columnNumber-1, row=rowNumber+1, outofBounds=False).first()
-            if cell:
-                cell.startingPoint = True
-                cell.save()
     
     def generate_mines(self, key):
 
@@ -378,7 +398,8 @@ class Game(models.Model):
         for cell in cells:
             count = 0
             if not cell.outofBounds:
-                for dx, dy in cell.directions():
+                geo = self.get_geometry()
+                for dx, dy in geo.get_directions(cell.row, cell.column):
                     neighbor = cell_map.get((cell.column + dx, cell.row + dy))
                     if neighbor and neighbor.mine:
                         count += 1
@@ -523,7 +544,8 @@ class Game(models.Model):
 
             if cell.adjacent == 0:
 
-                for dx, dy in cell.directions():
+                geo = self.get_geometry()
+                for dx, dy in geo.get_directions(cell.row, cell.column):
                     neighbour = self.board.filter(column=columnNumber+dx, row=rowNumber+dy, outofBounds=False).first()
                     if neighbour:
                         tempKey = self.get_key_from_coordinates(columnNumber+dx, rowNumber+dy)
@@ -538,29 +560,32 @@ class Game(models.Model):
         if not coordinates:
             return
         columnNumber, rowNumber = coordinates
-        clickedCell = self.board.filter(column=columnNumber, row=rowNumber, revealed=True).first()
+        cell = self.board.filter(column=columnNumber, row=rowNumber, revealed=True).first()
 
-        if clickedCell:
+        if cell:
             flagCount = 0
 
-            for dx, dy in clickedCell.directions():
+            geo = self.get_geometry()
+            for dx, dy in geo.get_directions(cell.row, cell.column):
                 neighbour = self.board.filter(column=columnNumber+dx, row=rowNumber+dy, outofBounds=False, flagged=True).first()
                 if neighbour:
                     flagCount += 1
 
-            if flagCount != clickedCell.adjacent:
+            if flagCount != cell.adjacent:
                 dummy = 0
             else:
                 incorrectFlag = False
 
-                for dx, dy in clickedCell.directions():
+                geo = self.get_geometry()
+                for dx, dy in geo.get_directions(cell.row, cell.column):
                     neighbour = self.board.filter(column=columnNumber+dx, row=rowNumber+dy, outofBounds=False, flagged=True, mine=False).first()
                     if neighbour:
                         incorrectFlag = True
 
                 if incorrectFlag:
 
-                    for dx, dy in clickedCell.directions():
+                    geo = self.get_geometry()
+                    for dx, dy in geo.get_directions(cell.row, cell.column):
                         neighbour = self.board.filter(column=columnNumber+dx, row=rowNumber+dy, outofBounds=False, revealed=False).first()
                         if neighbour:
                             self.singleClickCell(neighbour.key, recursive=True)
@@ -569,7 +594,8 @@ class Game(models.Model):
 
                 else:
 
-                    for dx, dy in clickedCell.directions():
+                    geo = self.get_geometry()
+                    for dx, dy in geo.get_directions(cell.row, cell.column):
                         neighbour = self.board.filter(column=columnNumber+dx, row=rowNumber+dy, outofBounds=False, flagged=True, revealed=False).first()
                         if neighbour:
                             tempkey = neighbour.key

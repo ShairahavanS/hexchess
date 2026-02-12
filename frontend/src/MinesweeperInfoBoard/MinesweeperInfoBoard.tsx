@@ -55,6 +55,26 @@ const MinesweeperInfoBoard: React.FC<MinesweeperInfoBoardProps> = ({
         </button>
       </div>
 
+      <div className="info-item game-mode-row">
+        <label htmlFor="game-mode-select">Game Mode: </label>
+        <select
+          id="game-mode-select"
+          value={gameMode}
+          onChange={handleGameModeChange}
+          className="game-mode-selector"
+        >
+          <option value="Square">Square</option>
+          <option value="Octagon-Square">Octagon-Square</option>
+          <option value="Triangle">Triangle</option>
+          <option value="Fish">Fish</option>
+          <option value="Square-Triangle">Square-Triangle</option>
+          <option value="Hexagon-Square-Triangle">
+            Hexagon-Square-Triangle
+          </option>
+          <option value="Star-Rhombus">Star-Rhombus</option>
+        </select>
+      </div>
+
       <div className="info-item level-row">
         <label htmlFor="level-select">Level: </label>
         <select
@@ -68,24 +88,6 @@ const MinesweeperInfoBoard: React.FC<MinesweeperInfoBoardProps> = ({
           <option value="Hard">Hard</option>
           <option value="Extreme">Extreme</option>
           <option value="Impossible">Impossible</option>
-        </select>
-      </div>
-
-      <div className="info-item game-mode-row">
-        <label htmlFor="game-mode-select">Game Mode: </label>
-        <select
-          id="game-mode-select"
-          value={gameMode}
-          onChange={handleGameModeChange}
-          className="game-mode-selector"
-        >
-          <option value="Square">Square</option>
-          <option value="Octagon-Square">Octagon-Square</option>
-          <option value="Triangle">Triangle</option>
-          <option value="Square-Triangle">Square-Triangle</option>
-          <option value="Hexagon-Square-Triangle">
-            Hexagon-Square-Triangle
-          </option>
         </select>
       </div>
     </div>

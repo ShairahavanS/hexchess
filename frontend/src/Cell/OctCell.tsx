@@ -85,8 +85,12 @@ const OctCell: React.FC<OctCellProps> = ({
     e.preventDefault();
     if (displayState != CellState.Unbroken) return;
 
+    console.log(gameMode);
+
     api
-      .post(`/minesweeper_api/${gameID}/single/`, { key: cellID })
+      .post(`/minesweeper_api/${gameID}/single/`, {
+        key: cellID,
+      })
       .then((response) => {
         onUpdateBoard?.(response.data.board); // 🔴 JUST SEND DELTAS
 
@@ -106,7 +110,9 @@ const OctCell: React.FC<OctCellProps> = ({
       return;
 
     api
-      .post(`/minesweeper_api/${gameID}/flag/`, { key: cellID })
+      .post(`/minesweeper_api/${gameID}/flag/`, {
+        key: cellID,
+      })
       .then((response) => {
         onUpdateBoard?.(response.data.board);
 
@@ -138,7 +144,9 @@ const OctCell: React.FC<OctCellProps> = ({
     if (displayState === CellState.Unbroken) return;
 
     api
-      .post(`/minesweeper_api/${gameID}/double/`, { key: cellID })
+      .post(`/minesweeper_api/${gameID}/double/`, {
+        key: cellID,
+      })
       .then((response) => {
         onUpdateBoard?.(response.data.board);
 

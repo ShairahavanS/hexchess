@@ -5,6 +5,7 @@ import BeesweeperInfoBoard from "../MinesweeperInfoBoard/BeesweeperInfoBoard.tsx
 import axios from "axios";
 import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
 import { BACKEND_URL } from "../constants.ts";
+import { useSearchParams } from "react-router-dom";
 
 export const api = axios.create({
   baseURL: BACKEND_URL,
@@ -27,7 +28,9 @@ interface BeesweeperProps {
 }
 
 const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
-  const [level, setLevel] = useState("Easy");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [level, setLevel] = useState(() => searchParams.get("level") ?? "Easy");
   const [sides, setSides] = useState(6);
   const [numCells, setNumCells] = useState(91);
   const [flags, setFlags] = useState(18);
@@ -48,6 +51,15 @@ const Beesweeper: React.FC<BeesweeperProps> = ({ darkMode }) => {
   const replaceBoard = (newBoard: MineCellInfo[]) => {
     setBoard(newBoard);
   };
+
+  useEffect(() => {
+    setSearchParams(
+      {
+        level,
+      },
+      { replace: true }
+    );
+  }, [level, setSearchParams]);
 
   const getSides = (level: string) => {
     switch (level) {

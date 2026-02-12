@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+
 import "./Minesweeper.css";
 import MinesweeperInfoBoard from "../MinesweeperInfoBoard/MinesweeperInfoBoard.tsx";
 import axios from "axios";
@@ -28,8 +30,6 @@ type BeeParticle = {
 };
 
 const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
-  const [level, setLevel] = useState("Easy");
-  const [gameMode, setGameMode] = useState("Octagon-Square");
   const [sides, setSides] = useState(6);
   const [numCells, setNumCells] = useState(91);
   const [flags, setFlags] = useState(18);
@@ -41,10 +41,28 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
 
   const [startTime, setStartTime] = useState<number | null>(null);
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [level, setLevel] = useState(() => searchParams.get("level") ?? "Easy");
+
+  const [gameMode, setGameMode] = useState(
+    () => searchParams.get("mode") ?? "Octagon-Square"
+  );
+
   // Replace entire board (start/reset)
   const replaceBoard = (newBoard: MineCellInfo[]) => {
     setBoard(newBoard);
   };
+
+  useEffect(() => {
+    setSearchParams(
+      {
+        level,
+        mode: gameMode,
+      },
+      { replace: true }
+    );
+  }, [level, gameMode, setSearchParams]);
 
   const getSides = (gameMode: string, level: string) => {
     switch (gameMode) {
@@ -78,20 +96,36 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
           default:
             return 9;
         }
+
+      case "Fish":
+        switch (level) {
+          case "Easy":
+            return 6;
+          case "Medium":
+            return 10;
+          case "Hard":
+            return 14;
+          case "Extreme":
+            return 18;
+          case "Impossible":
+            return 22;
+          default:
+            return 6;
+        }
       case "Triangle":
         switch (level) {
           case "Easy":
-            return 5;
-          case "Medium":
             return 9;
+          case "Medium":
+            return 16;
           case "Hard":
-            return 13;
+            return 22;
           case "Extreme":
-            return 17;
+            return 30;
           case "Impossible":
-            return 21;
+            return 40;
           default:
-            return 5;
+            return 9;
         }
       case "Square-Triangle":
         switch (level) {
@@ -154,13 +188,10 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
   };
 
   const startGame = () => {
-    api.post("/minesweeper_api/start/", { level }).then((res) => {
+    api.post("/minesweeper_api/start/", { level, gameMode }).then((res) => {
       const newSides = getSides(gameMode, level);
-      setSides(newSides); // set sides immediately
-      const tableLength = 2 * sides - 1;
-      const totalCells =
-        tableLength * tableLength -
-        2 * (Math.floor(tableLength / 2) * Math.floor(tableLength / 2 + 1));
+      const totalCells = res.data.numCells;
+      setSides(newSides);
       setNumCells(totalCells);
       setLostCellKey(null);
 
@@ -171,10 +202,7 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
       // Lazy revelation: all hidden
       const hiddenBoard: MineCellInfo[] = Array.from(
         { length: totalCells },
-        (_, i) => ({
-          key: i + 1,
-          kind: "hidden",
-        })
+        (_, i) => ({ key: i + 1, kind: "hidden" })
       );
       setBoard(hiddenBoard);
 
@@ -185,7 +213,7 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
 
   useEffect(() => {
     startGame(); // start new game whenever level changes
-  }, [level]);
+  }, [level, gameMode]);
 
   useEffect(() => {
     if (gameState === "NS") {
@@ -225,7 +253,13 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
       setLostCellKey(null);
 
       // lazy reset board
-      setBoard((prev) => prev.map((c) => ({ key: c.key, kind: "hidden" })));
+      setBoard(
+        Array.from({ length: numCells }, (_, i) => ({
+          key: i + 1,
+          kind: "hidden",
+        }))
+      );
+
       setFlags(res.data.flags ?? flags);
 
       // set game state last to trigger timer effect

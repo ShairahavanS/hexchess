@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./SquareCell.css";
+import "./TriangleCell.css";
 import mine from "../images/minesweeper/Mine.svg";
 import flag from "../images/minesweeper/Flag.svg";
 import one from "../images/minesweeper/Number1.svg";
@@ -26,7 +26,7 @@ export enum CellState {
   Trophy = "trophy",
 }
 
-interface SquareCellProps {
+interface TriangleCellProps {
   gameID: string;
   cellShape: string;
   cellID: number;
@@ -40,7 +40,7 @@ interface SquareCellProps {
   borderStyle?: React.CSSProperties;
 }
 
-const SquareCell: React.FC<SquareCellProps> = ({
+const TriangleCell: React.FC<TriangleCellProps> = ({
   gameID,
   cellShape,
   cellID,
@@ -195,7 +195,7 @@ const SquareCell: React.FC<SquareCellProps> = ({
     <div
       id={`cell-${cellID}`}
       className={`
-      square
+        ${cellShape}
       ${displayState.toLowerCase()}
       ${isLosingMine ? "explode" : ""}
     `}
@@ -212,4 +212,4 @@ const SquareCell: React.FC<SquareCellProps> = ({
   return cellElement;
 };
 
-export default SquareCell;
+export default TriangleCell;
