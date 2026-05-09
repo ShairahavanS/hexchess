@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./TriangleCell.css";
+import "./ArrowCell.css";
 import mine from "../images/minesweeper/Mine.svg";
 import flag from "../images/minesweeper/Flag.svg";
 import one from "../images/minesweeper/Number1.svg";
@@ -32,13 +32,15 @@ export enum CellState {
   Trophy = "trophy",
 }
 
-interface TriangleCellProps {
+interface ArrowCellProps {
   gameID: string;
   cellShape: string;
   cellID: number;
   cellData?: MineCellInfo;
   lostCellKey?: number | null;
   gameMode: string;
+  colorIndex?: number;
+  flip?: boolean;
   onUpdateBoard?: (changedCells: MineCellInfo[]) => void;
   onUpdateFlags?: (newFlags: number) => void;
   onUpdateGameState?: (state: string, triggerKey?: number) => void;
@@ -46,13 +48,15 @@ interface TriangleCellProps {
   borderStyle?: React.CSSProperties;
 }
 
-const TriangleCell: React.FC<TriangleCellProps> = ({
+const ArrowCell: React.FC<ArrowCellProps> = ({
   gameID,
   cellShape,
   cellID,
   cellData,
   lostCellKey,
   gameMode,
+  flip,
+  colorIndex = 0,
   onUpdateBoard,
   onUpdateFlags,
   onUpdateGameState,
@@ -63,6 +67,29 @@ const TriangleCell: React.FC<TriangleCellProps> = ({
     left: false,
     right: false,
   });
+
+  const COLOR_PALETTE = [
+    "#ff595e",
+    "#ffca3a",
+    "#8ac926",
+    "#1982c4",
+    "#6a4c93",
+    "#f72585",
+    "#b5179e",
+    "#7209b7",
+    "#560bad",
+    "#480ca8",
+    "#3a0ca3",
+    "#3f37c9",
+    "#4361ee",
+    "#4895ef",
+    "#4cc9f0",
+    "#ffd166",
+    "#ef476f",
+    "#06d6a0",
+    "#118ab2",
+    "#073b4c",
+  ];
 
   const displayState = (() => {
     if (!cellData) return CellState.Unbroken;
@@ -200,7 +227,7 @@ const TriangleCell: React.FC<TriangleCellProps> = ({
           case "12":
             return <img className="number" src={twelve} alt="12" />;
           default:
-            return <h1>{cellData.kind}</h1>;
+            return null;
         }
       case CellState.Empty:
         return <div className="empty-cell" />;
@@ -209,15 +236,31 @@ const TriangleCell: React.FC<TriangleCellProps> = ({
     }
   };
 
+  const renderCellStyles = () => {
+    if (
+      displayState === CellState.Unbroken ||
+      displayState === CellState.Flagged
+    ) {
+      // Inline styles for Unbroken and Flagged states
+      return {
+        backgroundColor: COLOR_PALETTE[colorIndex % COLOR_PALETTE.length],
+        ...(withBorder ? borderStyle : {}),
+      };
+    }
+    // If the state isn't unbroken or flagged, let CSS handle it
+    return {};
+  };
+
   const cellElement = (
     <div
       id={`cell-${cellID}`}
       className={`
-        ${cellShape}
+      arrow
+      ${flip ? "flipped" : ""}
       ${displayState.toLowerCase()}
       ${isLosingMine ? "explode" : ""}
     `}
-      style={withBorder ? borderStyle : {}}
+      style={renderCellStyles()} // Apply the styles based on state
       onClick={handleClick}
       onContextMenu={handleRightClick}
       onMouseDown={handleMouseDown}
@@ -230,4 +273,4 @@ const TriangleCell: React.FC<TriangleCellProps> = ({
   return cellElement;
 };
 
-export default TriangleCell;
+export default ArrowCell;

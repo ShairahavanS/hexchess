@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "./TriangleCell.css";
+import "./HexSquareTriangle.css";
+import "../CellBorder/OctCellBorder.css"; // Merge CSS files or keep separate
 import mine from "../images/minesweeper/Mine.svg";
 import flag from "../images/minesweeper/Flag.svg";
 import one from "../images/minesweeper/Number1.svg";
@@ -10,10 +11,6 @@ import five from "../images/minesweeper/Number5.svg";
 import six from "../images/minesweeper/Number6.svg";
 import seven from "../images/minesweeper/Number7.svg";
 import eight from "../images/minesweeper/Number8.svg";
-import nine from "../images/minesweeper/Number9.svg";
-import ten from "../images/minesweeper/Number10.svg";
-import eleven from "../images/minesweeper/Number11.svg";
-import twelve from "../images/minesweeper/Number12.svg";
 import trophy from "../images/minesweeper/Trophy.svg";
 import axios from "axios";
 import { MineCellInfo } from "./MineCellInfo.tsx";
@@ -32,7 +29,7 @@ export enum CellState {
   Trophy = "trophy",
 }
 
-interface TriangleCellProps {
+interface OctCellProps {
   gameID: string;
   cellShape: string;
   cellID: number;
@@ -46,7 +43,7 @@ interface TriangleCellProps {
   borderStyle?: React.CSSProperties;
 }
 
-const TriangleCell: React.FC<TriangleCellProps> = ({
+const OctCell: React.FC<OctCellProps> = ({
   gameID,
   cellShape,
   cellID,
@@ -89,6 +86,8 @@ const TriangleCell: React.FC<TriangleCellProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     if (displayState != CellState.Unbroken) return;
+
+    console.log(gameMode);
 
     api
       .post(`/minesweeper_api/${gameID}/single/`, {
@@ -191,16 +190,8 @@ const TriangleCell: React.FC<TriangleCellProps> = ({
             return <img className="number" src={seven} alt="7" />;
           case "8":
             return <img className="number" src={eight} alt="8" />;
-          case "9":
-            return <img className="number" src={nine} alt="9" />;
-          case "10":
-            return <img className="number" src={ten} alt="10" />;
-          case "11":
-            return <img className="number" src={eleven} alt="11" />;
-          case "12":
-            return <img className="number" src={twelve} alt="12" />;
           default:
-            return <h1>{cellData.kind}</h1>;
+            return null;
         }
       case CellState.Empty:
         return <div className="empty-cell" />;
@@ -213,7 +204,8 @@ const TriangleCell: React.FC<TriangleCellProps> = ({
     <div
       id={`cell-${cellID}`}
       className={`
-        ${cellShape}
+      oct-cell
+      ${cellShape === "square" ? "oct-square" : "octagon"}
       ${displayState.toLowerCase()}
       ${isLosingMine ? "explode" : ""}
     `}
@@ -230,4 +222,4 @@ const TriangleCell: React.FC<TriangleCellProps> = ({
   return cellElement;
 };
 
-export default TriangleCell;
+export default OctCell;

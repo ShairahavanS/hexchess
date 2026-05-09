@@ -19,6 +19,10 @@ class Geometry:
             self.rows = self.columns
             cut = self.side // 2
             self.numCells = self.columns * self.rows - 2 * (cut * (cut+1))
+        elif self.mode == "Star-Rhombus":
+            self.columns = self.side
+            self.rows = self.side
+            self.numCells = self.columns * self.rows
         elif self.mode == "Square":
             self.columns = self.side
             self.rows = self.side
@@ -27,6 +31,10 @@ class Geometry:
             self.columns = self.side
             self.rows = self.side
             self.numCells = self.columns * self.rows
+        elif self.mode == "Arrow":
+            self.columns = self.side*2
+            self.rows = self.side*2
+            self.numCells = self.side*self.side*2
         elif self.mode == "Triangle":
             self.columns = 2*self.side-1
             self.rows = self.side
@@ -38,13 +46,12 @@ class Geometry:
             tempSum = sum(range(2*self.side+1,4*self.side - 4, 4))
             if (2*self.side+1) == (4*self.side - 5):
                 tempSum = 2*self.side+1
-            print(tempSum)
             self.numCells = 2*self.side - 1 + 2*sum(range(self.side,2*self.side-1, 2))+2*tempSum
-            print(self.numCells)
         else:
             self.columns = self.side
             self.rows = self.side
             self.numCells = self.columns * self.rows
+            
 
     def is_out_of_bounds(self, col, row):
         cx = (self.columns - 1)/2
@@ -64,21 +71,33 @@ class Geometry:
                 row > col or
                 row > (self.columns - 1 - col)
             )
+        elif self.mode == "Arrow":
+            return (
+                (row+col)%2 == 1
+            )
         return False  # Square & default: no out-of-bounds
 
     def get_directions(self, row, col):
         """
         Return a list of neighbor offsets based on mode.
+        (column, row)
         """
         if self.mode == "Octagon-Square":
             if (row + col) % 2 == 0:  # octagon
                 return [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]
             else:  # square
                 return [(-1,0),(1,0),(0,-1),(0,1)]
+        if self.mode == "Star-Rhombus":
+            if (row + col) % 2 == 1:  # star
+                return [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]
+            else:  # square
+                return [(-1,0),(1,0),(0,-1),(0,1)]
         elif self.mode == "Square":
             return [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]
         elif self.mode == "Fish":
-            return [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(-1,1),(1,-1),(1,1)]
+            return [(-1,0),(1,0),(0,-1),(0,1),(-1,1),(1,-1)]
+        elif self.mode == "Arrow":
+            return [(-1,1),(-1,-1), (1,1), (1,-1), (2,0), (-2,0), (0,2), (0,-2)]
         elif self.mode == "Triangle":
             if (row + col) % 2 == 0:  # upward triangle ▲
                 return [
@@ -160,7 +179,7 @@ class Game(models.Model):
 
 
     game_ID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    gameMode = models.CharField(max_length=25, choices=[("Octagon-Square", "Octagon Square"), ("Square", "Square"), ("Triangle", "Triangle"), ("Square-Triangle", "Square Triangle"), ("Fish", "Fish"), ("Hexagon-Square-Triangle", "Hexagon Square Triangle")], default="Octagon-Square")
+    gameMode = models.CharField(max_length=25, choices=[("Arrow", "Arrow"), ("Star-Rhombus", "Star Rhombus"), ("Octagon-Square", "Octagon Square"), ("Square", "Square"), ("Triangle", "Triangle"), ("Square-Triangle", "Square Triangle"), ("Fish", "Fish"), ("Hexagon-Square-Triangle", "Hexagon Square Triangle")], default="Octagon-Square")
     progress = models.CharField(max_length=5, choices=[("NS", "Not Started"), ("IP", "In Progress"), ("WIN", "Win"), ("LOST", "Lost")], default="NS")
     level = models.CharField(max_length=20, choices=[("Easy", "Easy"), ("Medium", "Medium"), ("Hard", "Hard"), ("Extreme", "Extreme"), ("Impossible", "Impossible")], default="Easy")
     sideLength = models.IntegerField(default=5)
@@ -236,6 +255,8 @@ class Game(models.Model):
         # -----------------------------
         if self.gameMode == "Octagon-Square":
             sizes = {"Easy":5,"Medium":9,"Hard":13,"Extreme":17,"Impossible":21}
+        if self.gameMode == "Star-Rhombus":
+            sizes = {"Easy":9,"Medium":15,"Hard":21,"Extreme":27,"Impossible":33}
         elif self.gameMode == "Square":
             sizes = {"Easy":9,"Medium":16,"Hard":22,"Extreme":30,"Impossible":40}
         elif self.gameMode == "Fish":
@@ -244,6 +265,10 @@ class Game(models.Model):
             sizes = {"Easy":9,"Medium":16,"Hard":22,"Extreme":30,"Impossible":40}
         elif self.gameMode == "Hexagon-Square-Triangle":
             sizes = {"Easy":3,"Medium":5,"Hard":13,"Extreme":17,"Impossible":21}
+        elif self.gameMode == "Arrow":
+            sizes = {"Easy":5,"Medium":9,"Hard":13,"Extreme":17,"Impossible":21}
+        elif self.gameMode == "Star-Rhombus":
+            sizes = {"Easy":5,"Medium":9,"Hard":13,"Extreme":17,"Impossible":21}
         else:
             sizes = {"Easy":5,"Medium":9,"Hard":13,"Extreme":17,"Impossible":21}
 
@@ -297,6 +322,8 @@ class Game(models.Model):
         self.key_map = {}
         self.reverse_key_map = {}
 
+        
+
         for col in range(self.columns):
             for row in range(self.rows):
                 cell = cell_map[(col, row)]
@@ -305,6 +332,28 @@ class Game(models.Model):
                     self.key_map[str(key)] = [col, row]   # OPTIMIZED: JSON-safe
                     self.reverse_key_map[f"{col},{row}"] = key
                     key += 1
+
+        # Debug
+        stringy = ""
+        stringy1 = ""
+
+        for row in range(self.rows):
+            for col in range(self.columns):
+                cell = cell_map[(col, row)]
+                if cell.outofBounds:
+                    stringy = stringy + "O"
+                else:
+                    stringy = stringy + "X"
+                if not cell.outofBounds:
+                    stringy1 = stringy1 + str(cell.key-1) + "\t"
+            stringy = stringy + "\n"
+            stringy1 = stringy1 + "\n"
+        
+        # print(stringy)
+        # print(stringy1)
+        
+        # print(stringy)
+        # print(stringy1)
                     
         # --------------------------------------------------
         # OPTIMIZED: bulk update instead of per-cell save

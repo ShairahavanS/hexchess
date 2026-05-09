@@ -81,6 +81,23 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
           default:
             return 5;
         }
+
+        case "Star-Rhombus":
+          switch (level) {
+            case "Easy":
+              return 9;
+            case "Medium":
+              return 15;
+            case "Hard":
+              return 21;
+            case "Extreme":
+              return 27;
+            case "Impossible":
+              return 33;
+            default:
+              return 9;
+          }
+
       case "Square":
         switch (level) {
           case "Easy":
@@ -128,6 +145,21 @@ const Minesweeper: React.FC<MinesweeperProps> = ({ darkMode }) => {
             return 9;
         }
       case "Square-Triangle":
+        switch (level) {
+          case "Easy":
+            return 5;
+          case "Medium":
+            return 9;
+          case "Hard":
+            return 13;
+          case "Extreme":
+            return 17;
+          case "Impossible":
+            return 21;
+          default:
+            return 5;
+        }
+      case "Arrow":
         switch (level) {
           case "Easy":
             return 5;

@@ -13,8 +13,8 @@
 /* Fish Styling */
 
 .fish {
-  width: 100%;
-  height: 100%;
+  width: 95%;
+  height: 95%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,13 +26,13 @@
 }
 
 .fish-color-0 {
-  background-color: #42d6ff;
+  background-color: #4290fe;
 }
 .fish-color-1 {
-  background-color: #ffb347;
+  background-color: #ffa11d;
 }
 .fish-color-2 {
-  background-color: #ffa1c5;
+  background-color: #ff4a90;
 }
 
 .fish::before {
@@ -53,8 +53,9 @@
     );
   background-size: 40px 20px;
   background-repeat: repeat;
-  background-position: 0 0; /* shift first row */
+  background-position: 0 0;
 }
+
 .fish:nth-child(even)::before {
   background-position: 20px 0; /* shift every even row horizontally */
 }
@@ -63,14 +64,63 @@
 .fish.unbroken:hover {
   filter: brightness(1.2);
 }
-.fish.empty {
-  background-color: #60dad7; /* water-like pale blue */
+
+/* 🌊 Ocean water revealed style */
+.fish.empty,
+.fish.numbered {
   cursor: default;
+  background: radial-gradient(
+      circle at 30% 20%,
+      rgba(255, 255, 255, 0.25),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 70% 60%,
+      rgba(255, 255, 255, 0.18),
+      transparent 40%
+    ),
+    linear-gradient(180deg, #9bd4ff 0%, rgb(126, 229, 255) 35%, rgb(97, 229, 255) 55%, rgb(62, 255, 236) 100%);
+  background-size: 200% 200%;
+  animation: oceanFlow 8s ease-in-out infinite;
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.15);
 }
 
-.fish.numbered {
-  background-color: #60dad7; /* water-like pale blue */
-  cursor: default;
+@keyframes oceanFlow {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.fish.empty::after,
+.fish.numbered::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-radial-gradient(
+    circle at 20% 30%,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.12) 2%,
+    transparent 4%,
+    transparent 8%
+  );
+  opacity: 0.35;
+  pointer-events: none;
+  animation: rippleMove 6s linear infinite;
+}
+
+@keyframes rippleMove {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 120px 80px;
+  }
 }
 
 .fish.mine {

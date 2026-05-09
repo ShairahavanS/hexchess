@@ -8,6 +8,8 @@ import three from "../images/minesweeper/Number3.svg";
 import four from "../images/minesweeper/Number4.svg";
 import five from "../images/minesweeper/Number5.svg";
 import six from "../images/minesweeper/Number6.svg";
+import seven from "../images/minesweeper/Number7.svg";
+import eight from "../images/minesweeper/Number8.svg";
 import trophy from "../images/minesweeper/Trophy.svg";
 import axios from "axios";
 import { MineCellInfo } from "./MineCellInfo.tsx";
@@ -181,6 +183,10 @@ const SquareCell: React.FC<SquareCellProps> = ({
             return <img className="number" src={five} alt="5" />;
           case "6":
             return <img className="number" src={six} alt="6" />;
+          case "7":
+            return <img className="number" src={seven} alt="7" />;
+          case "8":
+            return <img className="number" src={eight} alt="8" />;
           default:
             return null;
         }

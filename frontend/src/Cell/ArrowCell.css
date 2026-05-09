@@ -1,18 +1,18 @@
-/* Hexagon Styling */
+/* arrow Styling */
 
-.hexagon {
-  background-color: orange;
+.arrow {
+  background-color: rgb(253, 119, 1);
   width: 90%; /* Adjust the size of the hexagon */
   height: 90%; /* Adjust the height for the hexagon */
   clip-path: polygon(
-    25% 0%,
-    75% 0%,
+    0% 25%,
+    50% 25%,
+    50% 0%,
     100% 50%,
-    75% 100%,
-    25% 100%,
-    0% 50%
-  ); /* Hexagonal shape */
-
+    50% 100%,
+    50% 75%,
+    0% 75%
+  );
   display: flex;
   align-items: center; /* Vertically center the content */
   justify-content: center; /* Horizontally center the content */
@@ -21,67 +21,53 @@
   position: relative; /* Ensure flexbox works correctly */
 }
 
+/* .arrow.flipped {
+  transform: scaleX(-1);
+} */
+
 /* Image inside the hexagon */
-.hexagon img {
+.arrow img {
   position: absolute;
-  width: 80%; /* Adjust the image size relative to the hexagon */
-  height: 80%; /* Ensure the image maintains its aspect ratio */
+  width: 30%; /* Adjust the image size relative to the hexagon */
+  height: 30%; /* Ensure the image maintains its aspect ratio */
   object-fit: contain; /* Maintain image aspect ratio without stretching */
   user-select: none; /* Prevent text/image selection */
   -webkit-user-drag: none; /* Prevent dragging images in WebKit browsers */
   pointer-events: none; /* Ignore pointer events on the image (so clicks go to the cell) */
+
+  left: 33%;
 }
 
-.hexagon.unbroken:hover {
-  background-color: rgb(213, 138, 0);
+.arrow.flipped img {
+  transform: scaleX(-1);
 }
 
-.hexagon.flagged:hover {
-  background-color: rgb(213, 138, 0);
+.arrow.unbroken:hover {
+  filter: brightness(0.75);
 }
 
-.hexagon.unbroken {
-  background-color: orange; /* or your default color */
-}
-
-.hexagon.flagged {
-  background-color: orange; /* or your default color */
-}
-
-.hexagon.empty {
+.arrow.empty {
   background-color: tan;
   cursor: default;
 }
 
-.hexagon.numbered {
+.arrow.numbered {
   background-color: tan;
   cursor: default;
 }
 
-.hexagon.bee {
+.arrow.mine {
   background-color: red;
   cursor: default;
 }
 
-.hexagon.honey img {
-  animation: beeGlow 1.2s ease-in-out infinite;
-}
-
-@keyframes beeGlow {
-  0% {
-    filter: drop-shadow(0 0 0 gold);
-  }
-  50% {
-    filter: drop-shadow(0 0 10px gold);
-  }
-  100% {
-    filter: drop-shadow(0 0 0 gold);
-  }
-}
-
-.hexagon.honey {
+.arrow.trophy {
   background-color: rgb(102, 255, 0);
   cursor: default;
+}
+
+.arrow.trophy img {
+  animation: trophyGlow 1.2s ease-in-out infinite;
 }
 
 @keyframes trophyGlow {
@@ -96,42 +82,9 @@
   }
 }
 
-/* Universal explosion */
-.explode {
+.arrow.explode {
   animation: explode 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2);
   z-index: 10;
-}
-
-.explode::before,
-.explode::after {
-  content: "";
-  position: absolute;
-  inset: -25%;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-/* Fire ring */
-.explode::before {
-  background: radial-gradient(
-    circle,
-    rgba(255, 180, 0, 0.9) 0%,
-    rgba(255, 80, 0, 0.8) 40%,
-    rgba(200, 0, 0, 0.6) 60%,
-    transparent 75%
-  );
-  animation: fireBurst 0.75s ease-out;
-}
-
-/* Optional flash core */
-.explode::after {
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 200, 0.8) 0%,
-    rgba(255, 200, 0, 0.6) 30%,
-    transparent 65%
-  );
-  animation: flash 0.2s ease-out;
 }
 
 @keyframes explode {
@@ -152,6 +105,26 @@
     opacity: 0.75;
     filter: brightness(1);
   }
+}
+
+.arrow-cell.explode::before,
+.arrow-cell.explode::after {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.arrow-cell.explode::before {
+  background: radial-gradient(
+    circle,
+    rgba(255, 180, 0, 0.9) 0%,
+    rgba(255, 80, 0, 0.8) 40%,
+    rgba(200, 0, 0, 0.6) 60%,
+    transparent 75%
+  );
+  animation: fireBurst 0.45s ease-out;
 }
 
 @keyframes fireBurst {

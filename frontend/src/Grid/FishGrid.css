@@ -1,51 +1,32 @@
 /* Minesweeper.css or fishGrid.css */
-
-.fish-grid {
-  aspect-ratio: 1 / 1;
-  padding: 1vmin;
+.fish-grid-container {
+  width: 100%; /* ✅ allow vertical fill */
+  aspect-ratio: 1/1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  flex-grow: 0;
-  flex-shrink: 0;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  position: relative;
 }
 
 .fish-cell-border {
   position: relative;
   background-color: white;
-  align-items: center;
-  justify-content: center;
-  display: flex;
   clip-path: url(#fishClip);
-  overflow: visible;
-}
-
-.fish-column {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.grid-container {
-  display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  display: flex;
+  flex: 1;
+}
+
+/* ROWS */
+.fish-row {
+  display: flex;
+  flex-direction: row;
   width: 100%;
   height: 100%;
-  overflow: visible;
-  flex-direction: row;
+  justify-content: flex-start;
 }
-/* 
-FishCell {
+
+/* .fish-cell-border {
   animation: swim 3s ease-in-out infinite;
   transform-origin: center;
 } */

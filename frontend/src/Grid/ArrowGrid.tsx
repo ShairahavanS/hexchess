@@ -1,6 +1,6 @@
 import React, { JSX, useRef, useState, useEffect } from "react";
-import "./FishGrid.css";
-import FishCell from "../Cell/FishCell.tsx";
+import "./ArrowGrid.css";
+import ArrowCell from "../Cell/ArrowCell.tsx";
 import axios from "axios";
 import { StringLiteral } from "typescript";
 import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
@@ -17,7 +17,7 @@ interface GridProps {
   onUpdateGameState?: (newState: string, triggerKey?: number) => void;
 }
 
-function FishGrid({
+function ArrowGrid({
   sideLength,
   game_ID,
   board,
@@ -29,36 +29,29 @@ function FishGrid({
 }: GridProps) {
   const rows: JSX.Element[] = [];
 
-  const ROWS = sideLength; // vertical density
+  const getCellData = (key: number) => board.find((cell) => cell.key === key);
+
+  const ROWS = sideLength * 2; // vertical density
   const COLS = sideLength;
 
-  const width = 100 / (0.7 * (COLS - 1) + 1);
-  const height = 100 / (0.8 * (ROWS - 1) + 1);
+  const width = (100 * (2 * COLS - 1)) / (2 * COLS);
+  const height = (100 * 2) / ROWS;
   const horizontalShift = (i: number) =>
-    i * ((100 * 0.2) / sideLength);
-  const horizontalRowShift = (i: number) => (i == 0 ? 0 : -i * 30);
-  const verticalShift = (i: number) => (i == 0 ? 0 : -height * 0.2125);
-
-  const getCellData = (key: number) => board.find((cell) => cell.key === key);
+    i % 2 == 0 ? 0 : width / 2 / sideLength;
+  const verticalShift = (i: number) => (i == 0 ? 0 : -height / 2);
 
   for (let r = 0; r < ROWS; r++) {
     const rowCells: JSX.Element[] = [];
+    const flip = r % 2 === 1; // alternate direction
 
+    let count = r % 2 == 0 ? r / 2 + 1 : Math.ceil(r / 2) + sideLength;
     for (let c = 0; c < COLS; c++) {
-      let count = c * sideLength + r + 1;
       const cellData = getCellData(count);
-      const colorIndex = (r + c) % 3; // <- alternate per fish diagonally
 
       rowCells.push(
-        <div
-          className="fish-cell-border"
-          key={count}
-          style={{
-            transform: `translateX(${horizontalRowShift(c)}%)`,
-          }}
-        >
-          <FishCell
-            cellShape={"fish"}
+        <div className="arrow-cell-border" key={count}>
+          <ArrowCell
+            cellShape={"arrow"}
             gameID={game_ID}
             cellID={count}
             cellData={cellData}
@@ -67,20 +60,22 @@ function FishGrid({
             onUpdateBoard={onUpdateBoard}
             onUpdateFlags={onUpdateFlags}
             onUpdateGameState={onUpdateGameState}
-            colorIndex={colorIndex}
+            colorIndex={(r + c) % 20}
+            flip={flip} // 👈 pass flip
           />
         </div>
       );
+      count = count + 2 * COLS;
     }
 
     rows.push(
       <div
         key={r}
-        className={`fish-row`}
+        className={`arrow-row ${flip ? "flip" : ""} `}
         style={{
-          width: `100%`,
+          width: `${width}%`,
           height: `${height}%`,
-          transform: `translateX(${horizontalShift(r)}%)`,
+          marginLeft: `${horizontalShift(r)}%`,
           marginTop: `${verticalShift(r)}%`,
         }}
       >
@@ -89,7 +84,7 @@ function FishGrid({
     );
   }
 
-  return <div className="fish-grid-container">{rows}</div>;
+  return <div className="arrow-grid-container">{rows}</div>;
 }
 
-export default FishGrid;
+export default ArrowGrid;

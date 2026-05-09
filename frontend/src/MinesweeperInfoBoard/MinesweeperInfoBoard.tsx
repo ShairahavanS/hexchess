@@ -67,11 +67,10 @@ const MinesweeperInfoBoard: React.FC<MinesweeperInfoBoardProps> = ({
           <option value="Octagon-Square">Octagon-Square</option>
           <option value="Triangle">Triangle</option>
           <option value="Fish">Fish</option>
-          <option value="Square-Triangle">Square-Triangle</option>
-          <option value="Hexagon-Square-Triangle">
-            Hexagon-Square-Triangle
-          </option>
-          <option value="Star-Rhombus">Star-Rhombus</option>
+          {/* <option value="Square-Triangle">Square-Triangle</option> */}
+          {/* <option value="Hexagon-Square-Triangle">Hexagon-Square-Triangle</option> */}
+          {/* <option value="Star-Rhombus">Star-Rhombus</option> */}
+          <option value="Arrow">Arrow</option>
         </select>
       </div>
 

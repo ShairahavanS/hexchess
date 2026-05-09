@@ -24,19 +24,15 @@
 }
 
 .square.unbroken:hover {
-  background-color: rgb(29, 7, 199);
-}
-
-.square.flagged:hover {
-  background-color: rgb(29, 7, 199);
+  filter: brightness(0.75);
 }
 
 .square.unbroken {
-  background-color: blue; /* or your default color */
+  background-color: rgb(166, 0, 255); /* or your default color */
 }
 
 .square.flagged {
-  background-color: blue; /* or your default color */
+  background-color: rgb(166, 0, 255); /* or your default color */
 }
 
 .square.empty {
