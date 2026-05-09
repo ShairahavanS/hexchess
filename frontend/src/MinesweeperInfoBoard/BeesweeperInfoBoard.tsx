@@ -1,7 +1,7 @@
 import React from "react";
 import "./BeesweeperInfoBoard.css";
-import flag from "../images/beesweeper/Flag.svg";
-import timer from "../images/beesweeper/Timer.svg";
+import flag from "../images/minesweeper/Flag.svg";
+import timer from "../images/minesweeper/Timer.svg";
 
 interface BeesweeperInfoBoardProps {
   level: string;

@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "../images/webdesign/HexChessLogo.svg";
 import checkerPiece from "../images/checkerPieces/Red Checker Piece.svg";
 import chessPiece from "../images/chessPieces/Chess_rdt45.svg";
-import bee from "../images/beesweeper/HexBee.svg";
+import bee from "../images/minesweeper/HexBee.svg";
 import mine from "../images/minesweeper/Mine.svg";
 import flag from "../images/minesweeper/Flag.svg";
 import trophy from "../images/minesweepersweeper/Trophy.svg";

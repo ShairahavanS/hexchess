@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./MinesweeperInfoBoard.css";
 import axios from "axios";
-import flag from "../images/beesweeper/Flag.svg";
-import timer from "../images/beesweeper/Timer.svg";
+import flag from "../images/minesweeper/Flag.svg";
+import timer from "../images/minesweeper/Timer.svg";
 
 interface MinesweeperInfoBoardProps {
   level: string;

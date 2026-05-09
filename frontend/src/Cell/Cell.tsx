@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import "./Cell.css";
 import "../CellBorder/CellBorder.css"; // Merge CSS files or keep separate
-import bee from "../images/beesweeper/HexBee.svg";
-import flag from "../images/beesweeper/Flag.svg";
-import one from "../images/beesweeper/Number1.svg";
-import two from "../images/beesweeper/Number2.svg";
-import three from "../images/beesweeper/Number3.svg";
-import four from "../images/beesweeper/Number4.svg";
-import five from "../images/beesweeper/Number5.svg";
-import six from "../images/beesweeper/Number6.svg";
-import honey from "../images/beesweeper/Honey.svg";
+import bee from "../images/minesweeper/HexBee.svg";
+import flag from "../images/minesweeper/Flag.svg";
+import one from "../images/minesweeper/Number1.svg";
+import two from "../images/minesweeper/Number2.svg";
+import three from "../images/minesweeper/Number3.svg";
+import four from "../images/minesweeper/Number4.svg";
+import five from "../images/minesweeper/Number5.svg";
+import six from "../images/minesweeper/Number6.svg";
+import honey from "../images/minesweeper/Honey.svg";
 import axios from "axios";
 import { MineCellInfo } from "../Cell/MineCellInfo.tsx";
 import { BACKEND_URL } from "../constants.ts";
