@@ -112,12 +112,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # CORS / CSRF
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  
+    "http://localhost:3000",
     "http://127.0.0.1:8000",
 
     "https://hexchess-ten.vercel.app",
-    "https://ShairahavanS.github.io",
+    "https://hexchess-git-main-travis-smoaks-projects.vercel.app",
 
+    "https://ShairahavanS.github.io",
 ]
 
 
@@ -127,5 +128,7 @@ CSRF_TRUSTED_ORIGINS = [
 
     "https://hexagonal-games-backend.onrender.com",
     "https://hexchess-ten.vercel.app",
+    "https://hexchess-git-main-travis-smoaks-projects.vercel.app",
+
     "https://ShairahavanS.github.io",
 ]
