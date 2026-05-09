@@ -20,18 +20,18 @@ DEBUG = True
 # DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME")
 
-ALLOWED_HOSTS=['*']
+# ALLOWED_HOSTS=['*']
 
-# ALLOWED_HOSTS = [
-#     "localhost",
-#     "127.0.0.1",
-#     "[::1]",
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "[::1]",
 
-#     ".onrender.com",
-#     ".vercel.app",
-#     ".netlify.app",
-#     "ShairahavanS.github.io",  
-# ]
+    ".onrender.com",
+    ".vercel.app",
+    ".netlify.app",
+    "ShairahavanS.github.io",  
+]
 
 # Application definition
 INSTALLED_APPS = [
